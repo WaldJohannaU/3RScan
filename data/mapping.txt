@@ -1,0 +1,536 @@
+ID	Label	NYU40	ScanNet	Eigen
+0	wall	1	2	12
+1	remove	0	0	0
+2	chair	5	3	4
+3	pillow	18	0	7
+4	box	29	0	7
+5	shelf	15	0	6
+6	floor	2	1	5
+7	ceiling	22	0	3
+8	plant	40	0	7
+9	door	8	6	0
+10	table	7	5	10
+11	window	9	12	13
+12	item	40	0	7
+13	lamp	35	0	7
+14	curtain	16	15	7
+15	object	40	0	7
+16	cabinet	3	7	6
+17	picture	11	13	8
+18	bag	37	0	7
+19	light	38	0	0
+20	clothes	21	0	7
+21	doorframe	38	0	0
+22	armchair	5	3	4
+23	sink	34	11	6
+24	kitchen cabinet	3	7	6
+25	towel	27	0	7
+26	heater	39	20	6
+27	stool	40	0	7
+28	trash can	40	0	7
+29	monitor	40	0	7
+30	blanket	40	0	7
+31	desk	14	9	10
+32	cushion	18	0	7
+33	commode	3	7	6
+34	wardrobe	39	20	6
+35	windowsill	38	0	0
+36	bed	4	8	1
+37	sofa	6	4	9
+38	basket	40	0	7
+39	bench	39	20	6
+40	tv	25	0	11
+41	coffee table	7	5	10
+42	nightstand	32	0	6
+43	clutter	40	0	7
+44	toilet	33	10	6
+45	radiator	39	20	6
+46	blinds	13	12	7
+47	bath cabinet	3	7	6
+48	kitchen counter	12	17	6
+49	stand	39	20	6
+50	mirror	19	0	7
+51	decoration	40	0	7
+52	bucket	40	0	7
+53	bicycle	40	0	7
+54	backpack	40	0	7
+55	counter	12	17	6
+56	tv stand	39	20	6
+57	couch	6	4	9
+58	pc	40	0	7
+59	shoes	40	0	7
+60	frame	38	0	0
+61	rack	39	20	6
+62	vase	40	0	7
+63	stove	38	0	0
+64	kitchen appliance	40	0	7
+65	side table	7	5	10
+66	washing machine	40	0	7
+67	oven	38	0	0
+68	couch table	7	5	10
+69	refrigerator	24	18	6
+70	showcase	3	7	6
+71	plank	38	0	0
+72	toilet paper	40	0	7
+73	microwave	40	0	7
+74	clothes dryer	40	0	7
+75	ottoman	39	20	6
+76	whiteboard	30	0	7
+77	bin	40	0	7
+78	pillar	38	0	0
+79	suitcase	40	0	7
+80	bathtub	36	19	6
+81	clock	40	0	7
+82	wall frame	11	13	8
+83	shower curtain	28	16	7
+84	laptop	40	0	7
+85	cupboard	3	7	6
+86	dining chair	5	3	4
+87	book	23	0	2
+88	puf	39	20	6
+89	bottle	40	0	7
+90	window frame	38	0	0
+91	boxes	29	0	7
+92	plate	40	0	7
+93	toilet brush	40	0	7
+94	sack	37	0	7
+95	telephone	40	0	7
+96	pack	40	0	7
+97	printer	40	0	7
+98	pipe	40	0	7
+99	shower	38	0	0
+100	kettle	40	0	7
+101	shower wall	1	2	12
+102	laundry basket	40	0	7
+103	flower	40	0	7
+104	drawer	39	20	6
+105	stairs	38	0	0
+106	table lamp	35	0	7
+107	garbage	40	0	7
+108	roll	40	0	7
+109	candle	40	0	7
+110	bowl	40	0	7
+111	desk chair	5	3	4
+112	bedside table	7	5	10
+113	dining table	7	5	10
+114	pot	40	0	7
+115	bookshelf	10	14	6
+116	organizer	40	0	7
+117	stuffed animal	40	0	7
+118	kitchen towel	27	0	7
+119	carpet	40	0	7
+120	cutting board	40	0	7
+121	beverage crate	29	0	7
+122	flowers	40	0	7
+123	items	40	0	7
+124	keyboard	40	0	7
+125	air conditioner	40	0	7
+126	device	40	0	7
+127	garbage bin	40	0	7
+128	board	38	0	0
+129	container	40	0	7
+130	stair	38	0	0
+131	tube	40	0	7
+132	beanbag	39	20	6
+133	books	40	0	7
+134	fireplace	38	0	0
+135	shades	38	0	0
+136	soap dispenser	40	0	7
+137	blackboard	38	0	0
+138	shelves	15	0	6
+139	bar	38	0	0
+140	coffee machine	40	0	7
+141	vacuum cleaner	40	0	7
+142	speaker	40	0	7
+143	sofa chair	5	3	4
+144	ball	40	0	7
+145	wall /other room	1	2	12
+146	scale	40	0	7
+147	rug	40	0	7
+148	toilet paper dispenser	40	0	7
+149	closet	39	20	6
+150	toy	40	0	7
+151	hand dryer	40	0	7
+152	column	38	0	0
+153	paper towel	40	0	7
+154	jar	40	0	7
+155	partition	1	2	12
+156	price tag	40	0	7
+157	file cabinet	3	7	6
+158	napkins	40	0	7
+159	objects	40	0	7
+160	paper towel dispenser	40	0	7
+161	hanger	40	0	7
+162	toiletry	40	0	7
+163	cube	40	0	7
+164	storage box	29	0	7
+165	ladder	39	20	6
+166	drying machine	40	0	7
+167	ironing board	40	0	7
+168	washing basket	40	0	7
+169	recycle bin	40	0	7
+170	pile of books	40	0	7
+171	jalousie	13	12	7
+172	menu	40	0	7
+173	umbrella	40	0	7
+174	floor /other room	2	1	5
+175	floor lamp	35	0	7
+176	luggage	40	0	7
+177	folder	40	0	7
+178	bean bag	39	20	6
+179	food	40	0	7
+180	guitar	40	0	7
+181	pan	40	0	7
+182	paper stack	26	0	7
+183	shelf unit	15	0	6
+184	kitchen hood	40	0	7
+185	salt	40	0	7
+186	flush	40	0	7
+187	exhaust hood	40	0	7
+188	office chair	5	3	4
+189	furniture	39	20	6
+190	computer	40	0	7
+191	computer desk	14	9	10
+192	bar stool	5	3	4
+193	foosball table	40	0	7
+194	coffee maker	40	0	7
+195	office table	7	5	10
+196	machine	40	0	7
+197	basin	40	0	7
+198	boots	40	0	7
+199	chandelier	38	0	0
+200	tray	40	0	7
+201	fruits	40	0	7
+202	spice	40	0	7
+203	balcony door	8	6	0
+204	locker	3	7	6
+205	fan	40	0	7
+206	hanging cabinet	3	7	6
+207	dish dryer	40	0	7
+208	ceiling light	35	0	7
+209	shoe shelf	15	0	6
+210	coat	40	0	7
+211	humidifier	40	0	7
+212	bottles	40	0	7
+213	round table	7	5	10
+214	bidet	40	0	7
+215	player	40	0	7
+216	extractor fan	40	0	7
+217	pile of papers	26	0	7
+218	drawers	17	0	6
+219	barrel	40	0	7
+220	wood	40	0	7
+221	rolled carpet	20	0	7
+222	trashcan	39	20	6
+223	shower floor	2	1	5
+224	toaster	40	0	7
+225	ventilation	38	0	0
+226	toilet paper holder	40	0	7
+227	cut board	40	0	7
+228	dishwasher	38	0	0
+229	statue	40	0	7
+230	tile	40	0	7
+231	painting	11	13	8
+232	drying rack	40	0	7
+233	paper	26	0	7
+234	tablet	7	5	10
+235	ventilator	40	0	7
+236	pile of bottles	40	0	7
+237	cup	40	0	7
+238	cleanser	40	0	7
+239	storage bin	40	0	7
+240	cart	40	0	7
+241	shoe	40	0	7
+242	dish	40	0	7
+243	kitchen rack	15	0	6
+244	poster	11	13	8
+245	mop	40	0	7
+246	magazine files	40	0	7
+247	pet bed	40	0	7
+248	water heater	40	0	7
+249	pictures	11	13	8
+250	crib	39	20	6
+251	railing	38	0	0
+252	sidecouch	6	4	9
+253	papers	26	0	7
+254	curtain rail	16	15	7
+255	shoe rack	15	0	6
+256	baby bed	39	20	6
+257	cable rack	15	0	6
+258	chairs	5	3	4
+259	upholstered wall	1	2	12
+260	baby changing unit	39	20	6
+261	documents	26	0	7
+262	footstool	39	20	6
+263	washing powder	40	0	7
+264	piano	39	20	6
+265	shampoo	40	0	7
+266	socket	40	0	7
+267	vacuum	40	0	7
+268	plants	40	0	7
+269	letter	26	0	7
+270	bath robe	40	0	7
+271	pile	40	0	7
+272	handhold	40	0	7
+273	breadboard	40	0	7
+274	pile of folders	26	0	7
+275	ramp	38	0	0
+276	sign	40	0	7
+277	storage container	29	0	7
+278	barstool	40	0	7
+279	cushions stack	18	0	7
+280	screen	40	0	7
+281	wardrobe door	8	6	0
+282	dispenser	40	0	7
+283	drum	40	0	7
+284	kids chair	5	3	4
+285	bread	40	0	7
+286	sideboard	12	17	6
+287	kitchen item	40	0	7
+288	sidetable	7	5	10
+289	loft bed	4	8	1
+290	milk	40	0	7
+291	squeezer	40	0	7
+292	tv table	7	5	10
+293	towel basket	40	0	7
+294	dress	40	0	7
+295	glass wall	1	2	12
+296	snowboard	40	0	7
+297	seat pad	18	0	7
+298	soap	40	0	7
+299	photo frame	11	13	8
+300	sewing machine	40	0	7
+301	soap dish	40	0	7
+302	fire extinguisher	40	0	7
+303	trash bin	40	0	7
+304	chest	39	20	6
+305	shower door	8	6	0
+306	t-shirt	40	0	7
+307	notebook	40	0	7
+308	rubbish bin	40	0	7
+309	handbag	40	0	7
+310	cap	40	0	7
+311	plates	40	0	7
+312	tree decoration	40	0	7
+313	bathroom items	40	0	7
+314	meter	40	0	7
+315	window board	38	0	0
+316	console	40	0	7
+317	armoire	3	7	6
+318	drawers rack	39	20	6
+319	folded beach chairs	5	3	4
+320	hater	40	0	7
+321	rocking chair	5	3	4
+322	towels	27	0	7
+323	multicooker	40	0	7
+324	pepper	40	0	7
+325	dresser	17	0	6
+326	grass	38	0	0
+327	dressing table	7	5	10
+328	knife box	29	0	7
+329	rolling cart	40	0	7
+330	rolling pin	40	0	7
+331	firewood box	29	0	7
+332	water	40	0	7
+333	dumbbells	40	0	7
+334	paper cutter	40	0	7
+335	crate	39	20	6
+336	stereo equipment	40	0	7
+337	hand washer	40	0	7
+338	iron	40	0	7
+339	treadmill	39	20	6
+340	fruit plate	40	0	7
+341	rag	27	0	7
+342	balcony	40	0	7
+343	jacket	40	0	7
+344	apron	40	0	7
+345	lockers	39	20	6
+346	aquarium	40	0	7
+347	tool wall	40	0	7
+348	window clutter	40	0	7
+349	pile of pillows	18	0	7
+350	boiler	40	0	7
+351	festoon	40	0	7
+352	armor	40	0	7
+353	kitchen sink	34	11	6
+354	oven glove	40	0	7
+355	dishdrainer	40	0	7
+356	figure	40	0	7
+357	tennis raquet	40	0	7
+358	kitchen sofa	6	4	9
+359	cable	40	0	7
+360	dishes	40	0	7
+361	pin board wall	40	0	7
+362	star	40	0	7
+363	things	40	0	7
+364	toy house	40	0	7
+365	bath	36	19	6
+366	magazine rack	15	0	6
+367	cycling trainer	40	0	7
+368	hood	40	0	7
+369	newspaper rack	15	0	6
+370	can	40	0	7
+371	darts	40	0	7
+372	statuette	40	0	7
+373	tire	40	0	7
+374	kids rocking chair	5	3	4
+375	hand brush	40	0	7
+376	kids stool	5	3	4
+377	mannequin	40	0	7
+378	cradle	39	20	6
+379	sheets	40	0	7
+380	fridge	24	18	6
+381	baby toys	40	0	7
+382	candlestick	40	0	7
+383	child clothes	21	0	7
+384	rowing machine	40	0	7
+385	elevator	38	0	0
+386	mattress	40	0	7
+387	watering can	40	0	7
+388	bike	40	0	7
+389	canopy	40	0	7
+390	children's table	7	5	10
+391	radio	40	0	7
+392	door /other room	8	6	0
+393	diapers	40	0	7
+394	shelf of caps	15	0	6
+395	weigths	40	0	7
+396	platform	38	0	0
+397	rail	38	0	0
+398	exit sign	40	0	7
+399	brochure	40	0	7
+400	carriage	40	0	7
+401	salad	40	0	7
+402	spices	40	0	7
+403	handrail	38	0	0
+404	pocket	40	0	7
+405	cups	40	0	7
+406	shirt	40	0	7
+407	sponge	40	0	7
+408	kitchen object	40	0	7
+409	beam	38	0	0
+410	case	40	0	7
+411	body loofah	40	0	7
+412	buggy	40	0	7
+413	fence	38	0	0
+414	storage unit	39	20	6
+415	generator	40	0	7
+416	wall rack	15	0	6
+417	bulletin board	40	0	7
+418	cooking pot	40	0	7
+419	shoe commode	17	0	6
+420	juicer	40	0	7
+421	beautician	40	0	7
+422	corner bench	39	20	6
+423	stroller	40	0	7
+424	ukulele	40	0	7
+425	seat	39	20	6
+426	folding chair	5	3	4
+427	washbasin	34	11	6
+428	bed table	7	5	10
+429	package	40	0	7
+430	clothes rack	15	0	6
+431	sugar packs	40	0	7
+432	helmet	40	0	7
+433	packs	40	0	7
+434	projector	40	0	7
+435	gymnastic ball	40	0	7
+436	changing table	7	5	10
+437	switch	40	0	7
+438	hair dryer	40	0	7
+439	bath counter	12	17	6
+440	mandarins	40	0	7
+441	puppet	40	0	7
+442	cover	40	0	7
+443	hygiene products	40	0	7
+444	baby seat	5	3	4
+445	child chair	5	3	4
+446	planter	40	0	7
+447	doll	40	0	7
+448	flag	40	0	7
+449	bath rack	15	0	6
+450	shower gel	40	0	7
+451	fruit	40	0	7
+452	elliptical trainer	40	0	7
+453	tree	40	0	7
+454	paper sign	26	0	7
+455	cleaning agent	40	0	7
+456	linen	21	0	7
+457	storage	40	0	7
+458	teapot	40	0	7
+459	handle	40	0	7
+460	pile of candles	40	0	7
+461	dining set	40	0	7
+462	tulle	40	0	7
+463	bbq	40	0	7
+464	oranizer	40	0	7
+465	drain pipe	38	0	0
+466	fabric	40	0	7
+467	podest	39	20	6
+468	sauce boat	40	0	7
+469	discs	40	0	7
+470	spots	35	0	7
+471	garden umbrella	40	0	7
+472	hangers	40	0	7
+473	kitchen playset	40	0	7
+474	wall plants	40	0	7
+475	closet door	8	6	0
+476	pooh	40	0	7
+477	shoe box	29	0	7
+478	jug	40	0	7
+479	pavement	38	0	0
+480	cloth	40	0	7
+481	scarf	40	0	7
+482	sink counter	12	17	6
+483	glass	38	0	0
+484	slanted wall	1	2	12
+485	headboard	39	20	6
+486	audio system	40	0	7
+487	magazine	40	0	7
+488	tent	40	0	7
+489	files	40	0	7
+490	kids bicycle	40	0	7
+491	baby changing table	7	5	10
+492	newspaper	26	0	7
+493	wood box	29	0	7
+494	calendar	40	0	7
+495	drinks	40	0	7
+496	urinal	40	0	7
+497	magazine stand	39	20	6
+498	xbox	40	0	7
+499	photos	11	13	8
+500	baby gym	39	20	6
+501	utensils	40	0	7
+502	roof	22	0	3
+503	stepladder	39	20	6
+504	tissue pack	40	0	7
+505	instrument	40	0	7
+506	kids table	7	5	10
+507	mask	40	0	7
+508	notebooks	40	0	7
+509	flipchart	40	0	7
+510	paper holder	40	0	7
+511	shelf clutter	40	0	7
+512	sofa couch	6	4	9
+513	stick	40	0	7
+514	bathrobe	40	0	7
+515	medical device	40	0	7
+516	cleaning brush	40	0	7
+517	doorframe /other room	38	0	0
+518	floor mat	20	0	7
+519	teddy bear	40	0	7
+520	brush	40	0	7
+521	lounger	5	3	4
+522	ceiling /other room	22	0	3
+523	pile of wires	40	0	7
+524	typewriter	40	0	7
+525	windows	9	12	13
+526	cosmetics kit	40	0	7
+527	coffee	40	0	7
+528	dog	40	0	7
+529	bath countertop	12	17	6
+530	candles	40	0	7
+531	stereo	40	0	7
+532	table soccer	40	0	7
+533	weights	40	0	7
+534	door mat	20	0	7
