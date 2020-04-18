@@ -13,8 +13,6 @@ Each sequence comes with aligned semantically annotated 3D data and correspondin
 * dense instance-level semantic segmentation where each instance has a fixed ID that is kept consistent across different sequences of the same environment.
 * object alignment, i.e. a ground truth transformation for each changed object together with its symmetry property.
 
-Please note, that ground truth semantics and poses of the scans in the hidden test set are not provided.
-
 ### Paper
 If you find the data useful please consider citing our [paper](https://arxiv.org/pdf/1908.06109.pdf):
 

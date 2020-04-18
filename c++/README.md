@@ -1,6 +1,6 @@
 # 3RScan Library and Renderer
 
-In the following we give detailed information on how to process files in 3RScan from the [paper](https://arxiv.org/abs/1908.06109) RIO: 3D Object Instance Re-Localization in Changing Indoor Environments. We provide a c++ library [rio_lib](https://github.com/WaldJohannaU/3RScan/tree/master/c++/rio_lib/rio_lib), an [example](https://github.com/WaldJohannaU/3RScan/tree/master/c++/rio_lib/example) project as well as a [rendering application](https://github.com/WaldJohannaU/3RScan/tree/master/c++/rio_renderer) to generate 2D renderings with semantics, depth or RGB.
+In the following we give detailed information on how to process files in 3RScan from the [paper](https://arxiv.org/abs/1908.06109) RIO: 3D Object Instance Re-Localization in Changing Indoor Environments. We provide a c++ library [rio_lib](https://github.com/WaldJohannaU/3RScan/tree/master/c++/rio_lib/src/rio_lib), an [example](https://github.com/WaldJohannaU/3RScan/tree/master/c++/rio_lib/src/example) project as well as a [rendering application](https://github.com/WaldJohannaU/3RScan/tree/master/c++/rio_renderer) to generate 2D renderings with semantics, depth or RGB.
 
 ## Getting Started
 
@@ -81,7 +81,7 @@ If you find this useful, please consider citing the corresponding publication:
 
 ## Contact
 
-If you have questions checks out our [FAQ](https://github.com/WaldJohannaU/3RScan/c++/FAQ.md) or send me an [email](mailto:johanna.wald@tum.de) if things are still unclear. We are constantly working on improving our dataset and code, so stay tuned!
+If you have questions checks out our [FAQ](https://github.com/WaldJohannaU/3RScan/tree/master/FAQ.md) or send me an [email](mailto:johanna.wald@tum.de) if things are still unclear. We are constantly working on improving our dataset and code, so stay tuned!
 
 ## Notes:
 * Please see our [project page](https://waldjohannau.github.io/RIO) for more information.
