@@ -2,7 +2,7 @@
 
 3RScan is a large scale, real-world dataset which features 1482 3D reconstructions / snapshots of 478 naturally changing indoor environments, designed for benchmarking emerging tasks such as long-term SLAM, scene change detection and object instance re-localization
 
-![example](data/teaser.png)
+![teaser](data/img/teaser.png)
 
 Each sequence comes with aligned semantically annotated 3D data and corresponding 2D frames, containing in detail:
 
@@ -27,7 +27,7 @@ If you find the data useful please consider citing our [paper](https://arxiv.org
 }
 ```
 
-## Data Organization
+## Data Organization and Format
 
 The data in 3RScan is organized by RGB-D sequence. Each sequence has a unique hash value to identify the scan. The RGB-sequences and 3D reconstructions are all stored together in a separate folder. The directory has the following structure:
 
@@ -49,7 +49,7 @@ The data in 3RScan is organized by RGB-D sequence. Each sequence has a unique ha
     Instance segmentation of the mesh (contains the labels)
 ```
 
-## Data Formats
+### Data Formats
 
 The following are overviews of the data formats used in 3RScan:
 
@@ -59,39 +59,33 @@ OBJ format mesh with +Z axis in upright orientation.
 **RGB-D sensor data (`*.zip`)**:
 ZIP-archive with per-frame color, depth, camera pose and camera intrinsics.
 
-**Surface mesh segmentation file (`*.segs.json`)**:
+**Instance segmentation of the mesh (`semseg.json`)**:
 ```javascript
 {
-  "params": {  // segmentation parameters
-   "kThresh": "0.0001",
-   "segMinVerts": "20",
-   "minPoints": "750",
-   "maxPoints": "30000",
-   "thinThresh": "0.05",
-   "flatThresh": "0.001",
-   "minLength": "0.02",
-   "maxLength": "1"
-  },
-  "sceneId": "...",  // id of segmented scene
-  "segIndices": [1,1,1,1,3,3,15,15,15,15],  // per-vertex index of mesh segment
-}
-```
-
-**Aggregated semantic annotation file (`*semseg.json`)**:
-```javascript
-{
-  "sceneId": "...",  // id of annotated scene
-  "appId": "...", // id + version of the tool used to create the annotation
+  "sceneId": "tangonet.8eabc405-5af7-2f32-86d2-d757fa7b019d",
+  ...
   "segGroups": [
     {
-      "id": 0,
-      "objectId": 0,
-      "segments": [1,4,3],
-      "label": "couch"
-    },
-  ],
-  "segmentsFile": "..." // id of the *.segs.json segmentation file referenced
-}
+      "id": 15,
+      "objectId": 15,
+      "label": "window",
+      "segments": [ 21, 175, ... ],
+      "obb": {
+        "centroid": [ 2.15, 2.17, -1.18 ],
+        "axesLengths": [ 4.57, 0.62, 4.14 ],
+        ...
+      }, 
+      ...
+    }, {
+      "objectId": 29,
+      "label": "plant",
+      ...
+    }, {
+      "id": 14,
+      "objectId": 14,
+      "label": "windowsill",
+      ...
+    }
 ```
 
 **meta data file (`3RScan.json`)**:
@@ -136,11 +130,11 @@ ZIP-archive with per-frame color, depth, camera pose and camera intrinsics.
 ]
 ```
 
-## Training Data
+## 3RScan Library and Examples
 
-You can find the train, test and validation splits here: [[train](splits/train.txt), [val](splits/val.txt), [test](splits/test.txt)]
+For examples on how to read these files or how to use 3RScan in general see our code samples and [documentation](https://github.com/WaldJohannaU/3RScan/tree/master/c++/README.md). You have a question? Check out our [FAQ](https://github.com/WaldJohannaU/3RScan/tree/master/FAQ.md).
 
-### Notes:
-* segmentation format (surface mesh segmentation and aggregated semantic annotation) is the same as in [ScanNet](https://github.com/ScanNet/ScanNet)
+## Notes
+* Training Data: You can find the train, test and validation splits here: [[train](splits/train.txt), [val](splits/val.txt), [test](splits/test.txt)]
+* Segmentation format (surface mesh segmentation and aggregated semantic annotation) is the same as in [ScanNet](https://github.com/ScanNet/ScanNet)
 * Please see our [project page](https://waldjohannau.github.io/RIO) for more information.
-
