@@ -40,7 +40,7 @@ This downloads a rescan and it's corresponding reference and prepares the requir
   cd rio_lib
   mkdir build
   cd build
-  cmake -DCMAKE_BUILD-TYPE=Release ..
+  cmake -DCMAKE_BUILD_TYPE=Release ..
   make
 ```
 
