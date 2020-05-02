@@ -40,7 +40,7 @@ This downloads a rescan and it's corresponding reference and prepares the requir
   cd rio_lib
   mkdir build
   cd build
-  cmake -DCMAKE_BUILD-TYPE=Release ..
+  cmake -DCMAKE_BUILD_TYPE=Release ..
   make
 ```
 
@@ -57,7 +57,7 @@ Our renderer application additionally requires OpenGL, GLFW3, GLEW, [Assimp](htt
   cd rio_renderer
   mkdir build
   cd build
-  cmake -DCMAKE_BUILD-TYPE=Release ..
+  cmake -DCMAKE_BUILD_TYPE=Release ..
   make
 ```
 
