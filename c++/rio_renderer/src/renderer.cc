@@ -170,7 +170,7 @@ void Renderer::ReadLabels(cv::Mat& image, cv::Mat& instances) {
             for (int j = 0; j < buffer_width; ++j) {
                 for (int c = 0; c < 3; c++) {
                     image.at<cv::Vec3b>(buffer_height - i - 1, j)[2 - c] = 
-                        static_cast<int>(256 * data_buff[int(3 * i * buffer_width + 3 * j + c)]);
+                        static_cast<int>(255 * data_buff[int(3 * i * buffer_width + 3 * j + c)]);
                 }
             }
         }
@@ -209,7 +209,7 @@ void Renderer::ReadRGB(cv::Mat& image) {
         for (int j = 0; j < buffer_width; ++j) {
             for (int c = 0; c < 3; c++) {
                 image.at<cv::Vec3b>(buffer_height - i - 1, j)[2 - c] = 
-                    static_cast<int>(256 * data_buff[int(3 * i * buffer_width + 3 * j + c)]);
+                    static_cast<int>(255 * data_buff[int(3 * i * buffer_width + 3 * j + c)]);
             }
         }
     }
