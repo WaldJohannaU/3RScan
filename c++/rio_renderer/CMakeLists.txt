@@ -13,7 +13,18 @@ find_package(assimp REQUIRED)
 add_executable(${PROJECT_NAME} src/main.cc src/data.cc 
 								src/util.cc src/renderer.cc src/json11.cpp)
 
+add_executable(${PROJECT_NAME}_render_all src/render_all_main.cc src/data.cc 
+								src/util.cc src/renderer.cc src/json11.cpp)
+
 target_include_directories(${PROJECT_NAME} PRIVATE include
+					${EIGEN3_INCLUDE_DIR}
+					${OPENGL_INCLUDE_DIR}
+					${OpenCV_INCLUDE_DIRS}
+					${GLFW_INCLUDE_DIRS}
+					${GLEW_INCLUDE_PATH}
+					${assimp_INCLUDE_DIRS})
+
+target_include_directories(${PROJECT_NAME}_render_all PRIVATE include
 					${EIGEN3_INCLUDE_DIR}
 					${OPENGL_INCLUDE_DIR}
 					${OpenCV_INCLUDE_DIRS}
@@ -23,4 +34,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE include
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${OPENGL_LIBRARIES}
+									${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${assimp_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME}_render_all ${OpenCV_LIBS} ${OPENGL_LIBRARIES}
 									${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${assimp_LIBRARIES})
