@@ -8,9 +8,14 @@ namespace RIO {
 
 Renderer::Renderer(const std::string& sequence_path, 
                    const std::string& data_path, 
-                   const std::string& scan_id): 
+                   const std::string& scan_id,
+                   bool save_images_and_bbox,
+                   bool save_occlusion,
+                   float fov_scale): 
                    data_path_(data_path), sequence_path_(sequence_path),
-                   rio_data_(scan_id),  data_(sequence_path) {
+                   rio_data_(scan_id),  data_(sequence_path), data_fov_scale_(sequence_path, fov_scale),
+                   save_images_and_bbox_(save_images_and_bbox),
+                   save_occlusion_(save_occlusion) {
 }
 
 Renderer::~Renderer() {
@@ -46,7 +51,7 @@ const cv::Mat& Renderer::GetDepth() const {
 }
 
 int Renderer::Init() {
-    if (!(glfwInit() && data_.LoadIntrinsics()))
+    if (!(glfwInit() && data_.LoadIntrinsics() && data_fov_scale_.LoadIntrinsics()))
         return -1; 
 
     InitGLFW();
@@ -61,11 +66,36 @@ int Renderer::Init() {
     if (GLEW_OK != glewInit())
         return EXIT_FAILURE;
     glEnable(GL_DEPTH_TEST);
+    
     // Setup and compile our shaders
     shader_labels_ = new Shader("../res/color3D.vs", "../res/color3D.frag");
     shader_RGB_ = new Shader("../res/textured3D.vs", "../res/textured3D.frag");
+
+    // load models with all objects in it
     model_labels_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated.ply");
-    model_RGB_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/mesh.refined.obj");
+    if(save_images_and_bbox_){
+        model_RGB_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/mesh.refined.obj");
+    }
+
+    // load models with just one instance visible
+    if(save_occlusion_){
+        LoadObjects(data_path_ + "/objects.json"); // load this now because we need it now (otherwise it is loaded in first render call)
+        for (const auto& i2c: rio_data_.instance2color) {
+            const int instance_id = i2c.first;
+            const unsigned long color = i2c.second; // this is the RGB hex value stored in an ulong
+            
+            // extract RGB color values
+            const int r = ((color >> 16) & 0xFF);  // Extract the RR byte
+            const int g = ((color >> 8) & 0xFF);   // Extract the GG byte
+            const int b = ((color) & 0xFF);        // Extract the BB byte
+
+            // create model with only the current instance visible
+            glm::vec3 rgb(r / 255.0f, g / 255.0f, b / 255.0f); // required to be in [0..1] scale because this is how the colors are defined in the mesh file
+            Model* model_label_one_instance_only = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated.ply", rgb);
+            instance2model_with_instance_only_[instance_id] = model_label_one_instance_only;
+        }
+    }
+
     data_.LoadViewMatrix();
     initalized_ = true;
     // We have to read the buffer size because of retrina displays. 
@@ -81,28 +111,67 @@ void Renderer::Render(const int frame_id, const std::string save_path) {
 void Renderer::Render(const bool inc_frame_id, const std::string save_path) {
     if (!initalized_)
         return;
-    projection_ = camera_utils::perspective<Eigen::Matrix4f::Scalar>(data_.intrinsics, kNearPlane, kFarPlane);
+    
     GLuint framebuffername = 1;
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffername);
-    DrawScene(*model_RGB_, *shader_RGB_);
-    ReadRGB(rio_data_.color);
-    ReadDepth(rio_data_.depth);
+
+    // the default projection matrix (without scaled fov value)
+    projection_ = camera_utils::perspective<Eigen::Matrix4f::Scalar>(data_.intrinsics, kNearPlane, kFarPlane);    
+
+    // this is needed for both saving cases so always render it
     DrawScene(*model_labels_, *shader_labels_);
     ReadLabels(rio_data_.labels, rio_data_.instances);
-    if ((save_path != "") && (!rio_data_.color.empty())) {
+
+    if (save_path != "" && (save_images_and_bbox_ || save_occlusion_)) {
         std::stringstream filename;
         filename << save_path << "/frame-" << std::setfill('0') << std::setw(6) << data_.frame_id();
-        cv::imwrite(filename.str() + ".rendered.color.jpg", rio_data_.color);
-        cv::imwrite(filename.str() + ".rendered.depth.png", rio_data_.depth);
-        cv::imwrite(filename.str() + ".rendered.labels.png", rio_data_.labels);
-        cv::imwrite(filename.str() + ".rendered.instances.png", rio_data_.instances);
-        std::ofstream outfile(filename.str() + ".bb.txt");
-        for (const auto& bb: rio_data_.bboxes) {
-            const Eigen::Vector4i& box = bb.second;
-            if (rio_data_.instance2label.find(bb.first) != rio_data_.instance2label.end()) 
-                outfile << bb.first << " " << box(0) << " " << box(1) << " " << box(2) << " " << box(3) << std::endl;
+
+        // render + save rendered color, depth, label, instance images and the bbox file.
+        if(save_images_and_bbox_){
+            // only now are the rgb and depth images needed
+            DrawScene(*model_RGB_, *shader_RGB_);
+            ReadRGB(rio_data_.color);
+            ReadDepth(rio_data_.depth);
+
+            cv::imwrite(filename.str() + ".rendered.color.jpg", rio_data_.color);
+            cv::imwrite(filename.str() + ".rendered.depth.png", rio_data_.depth);
+            cv::imwrite(filename.str() + ".rendered.labels.png", rio_data_.labels);
+            cv::imwrite(filename.str() + ".rendered.instances.png", rio_data_.instances);
+            std::ofstream outfile(filename.str() + ".bb.txt");
+            for (const auto& bb: rio_data_.bboxes) {
+                const Eigen::Vector4i& box = bb.second;
+                if (rio_data_.instance2label.find(bb.first) != rio_data_.instance2label.end()) 
+                    outfile << bb.first << " " << box(0) << " " << box(1) << " " << box(2) << " " << box(3) << std::endl;
+            }
+            outfile.close();
         }
-        outfile.close();
+
+        // render + save the occlusion score for each object instance id
+        if(save_occlusion_){
+            // use original intrinsics for calculating occlusion
+            CalcOcclusions(rio_data_.instance2color, rio_data_.instances2occlusion, rio_data_.labels);
+
+            // use fov scaled intrinsics for calcuating truncation
+            projection_ = camera_utils::perspective<Eigen::Matrix4f::Scalar>(data_fov_scale_.intrinsics, kNearPlane, kFarPlane);
+            DrawScene(*model_labels_, *shader_labels_);
+            ReadLabels(rio_data_.labels_fov_scale, rio_data_.instances);
+            CalcTruncations(rio_data_.instance2color, rio_data_.instances2truncation, rio_data_.labels_fov_scale);
+
+            // verify calculations
+            VerifyTruncationAndOcclusion(rio_data_.instances2occlusion, rio_data_.instances2truncation);
+
+            std::ofstream outfile(filename.str() + ".visibility.txt");
+            for (const auto& instance2occlusion : rio_data_.instances2occlusion) {
+                int instance_id = instance2occlusion.first;
+                Renderer::VisibilityEntry occlusion = instance2occlusion.second;
+                Renderer::VisibilityEntry truncation = rio_data_.instances2truncation[instance_id];
+                
+                if (rio_data_.instance2label.find(instance_id) != rio_data_.instance2label.end())
+                    outfile << instance_id << " " << truncation.original_pixel_count << " " << truncation.complete_pixel_count << " " << truncation.ratio << " " << occlusion.original_pixel_count << " " << occlusion.complete_pixel_count << " " << occlusion.ratio << std::endl;
+            }
+            outfile.close();
+        }
+        
     }
     if (inc_frame_id)
         data_.NextFrame();
@@ -229,6 +298,144 @@ void Renderer::ReadDepth(cv::Mat& image) {
         }
     }
     cv::rotate(image, image, cv::ROTATE_90_CLOCKWISE);
+}
+
+void Renderer::CalcTruncations(std::map<int, unsigned long>& instances2color, std::map<int, Renderer::VisibilityEntry>& instances2truncation, const cv::Mat& labels_fov_scale) {
+    
+    for (const auto& instance2color: instances2color) {
+        const int instance_id = instance2color.first;
+        const unsigned long color = instance2color.second; // this is the RGB hex value stored in an ulong
+
+        // check if the parsing worked as expected. This should only fail when something is wrong with the metadata.
+        if (rio_data_.instance2label.find(instance_id) == rio_data_.instance2label.end()) continue;
+
+        // extract RGB color values
+        const int r = ((color >> 16) & 0xFF);  // Extract the RR byte
+        const int g = ((color >> 8) & 0xFF);   // Extract the GG byte
+        const int b = ((color) & 0xFF);        // Extract the BB byte
+
+        // create rect at large image to crop small image part of it
+        const int rows = labels_fov_scale.rows;
+        const int cols = labels_fov_scale.cols;
+
+        // the original image is located at the center of the rendered image with below width/height.
+        // Its upper left corner is thus fov_scale*2-times the width/height (== center of rendered image - half of original image width/height)
+        const int x = static_cast<int>(rows / (data_fov_scale_.fov_scale()*2));
+        const int y = static_cast<int>(cols / (data_fov_scale_.fov_scale()*2));
+
+        // the original image is fov_scale-times smaller than the rendered image
+        const int width = static_cast<int>(rows / data_fov_scale_.fov_scale());
+        const int height = static_cast<int>(cols / data_fov_scale_.fov_scale());
+        cv::Rect rect(y, x, height, width);
+        cv::Mat original_image = labels_fov_scale(rect);
+
+        // create image masks that only contain the color
+        cv::Mat dst_large, dst_small;
+        cv::Scalar cv_color(b, g, r); // color must be in BGR format
+
+        cv::inRange(labels_fov_scale, cv_color, cv_color, dst_large); // creates a black-white image in dst that has white pixels that match the color, rest black
+        const int number_pixels_large = cv::countNonZero(dst_large); // counts the white pixels
+
+        cv::inRange(original_image, cv_color, cv_color, dst_small); // creates a black-white image in dst that has white pixels that match the color, rest black
+        const int number_pixels_small = cv::countNonZero(dst_small); // counts the white pixels
+
+        // instance2color map contains all instances for the scene and not all instances for this frame.
+        // Thus, some instances are not visible in the current frame or frame-enlargement. 
+        // If this is the case, we do not consider that instance to have a truncation score in this frame.
+        // Only instances that are visible will be added to the truncation list for this frame.
+        const bool valid_instance = number_pixels_large > 0 && number_pixels_small > 0; 
+
+        if(valid_instance){
+            instances2truncation[instance_id] = Renderer::VisibilityEntry(static_cast<float>(number_pixels_small),
+                                                                            static_cast<float>(number_pixels_large));
+        }
+    }
+    
+}
+
+void Renderer::CalcOcclusions(std::map<int, unsigned long>& instances2color, std::map<int, Renderer::VisibilityEntry>& instances2occlusion, const cv::Mat& labels){
+    for (const auto& instance2color: instances2color) {
+        const int instance_id = instance2color.first;
+        const unsigned long color = instance2color.second; // this is the RGB hex value stored in an ulong
+
+        // check if the parsing worked as expected. This should only fail when something is wrong with the metadata.
+        if (rio_data_.instance2label.find(instance_id) == rio_data_.instance2label.end()) continue;
+
+        // extract RGB color values
+        const int r = ((color >> 16) & 0xFF);  // Extract the RR byte
+        const int g = ((color >> 8) & 0xFF);   // Extract the GG byte
+        const int b = ((color) & 0xFF);        // Extract the BB byte
+
+        // load model with only the current instance visible
+        Model* model_label_one_instance_only = instance2model_with_instance_only_[instance_id];
+
+        // render label image with just this instance
+        cv::Mat label_image_one_instance_only, instance_image_one_instance_only;
+        DrawScene(*model_label_one_instance_only, *shader_labels_);
+        ReadLabels(label_image_one_instance_only, instance_image_one_instance_only);
+
+        // count the pixels in the original image (with all instances rendered) and in the image with just this instance
+        cv::Mat dst_original, dst_one_instance_only;
+        cv::Scalar cv_color(b, g, r); // color must be in BGR format
+
+        cv::inRange(labels, cv_color, cv_color, dst_original); // creates a black-white image in dst that has white pixels that match the color, rest black
+        const int number_pixels_original = cv::countNonZero(dst_original); // counts the white pixels
+
+        cv::inRange(label_image_one_instance_only, cv_color, cv_color, dst_one_instance_only); // creates a black-white image in dst that has white pixels that match the color, rest black
+        const int number_pixels_one_instance_only = cv::countNonZero(dst_one_instance_only); // counts the white pixels
+
+        // instance2color map contains all instances for the scene and not all instances for this frame.
+        // Thus, some instances are not visible in the current frame or frame-enlargement. 
+        // If this is the case, we do not consider that instance to have a occlusion score in this frame.
+        // Only instances that are visible will be added to the occlusion list for this frame.
+        const bool valid_instance = number_pixels_original > 0 && number_pixels_one_instance_only > 0; 
+
+        if(valid_instance){
+            instances2occlusion[instance_id] = Renderer::VisibilityEntry(static_cast<float>(number_pixels_original),
+                                                                            static_cast<float>(number_pixels_one_instance_only));
+        }
+    }
+}
+
+void Renderer::VerifyTruncationAndOcclusion(std::map<int, Renderer::VisibilityEntry>& instances2occlusion, std::map<int, Renderer::VisibilityEntry>& instances2truncation){
+    // create dummy vector to add in all cases where no value is found
+    Renderer::VisibilityEntry dummy_value;
+    
+    // go over all entries in occlusion and check if truncation is also set. If it is not set: set it to the dummy_value
+    for(auto it = instances2occlusion.cbegin(); it != instances2occlusion.cend(); ++it) {
+        bool present = instances2truncation.find(it->first) != instances2truncation.end();
+        if(! present){
+            instances2truncation[it->first] = dummy_value;
+        }
+    }
+
+    // go over all entries in truncation and check if occlusion is also set. If it is not set: set it to the dummy_value
+    for(auto it = instances2truncation.cbegin(); it != instances2truncation.cend(); ++it) {
+        bool present = instances2occlusion.find(it->first) != instances2occlusion.end();
+        if(! present){
+            instances2occlusion[it->first] = dummy_value;
+        }
+    }
+
+    // now the size must be equal otherwise this is a huge error
+    assert(rio_data_.instances2truncation.size() == rio_data_.instances2occlusion.size());
+}
+
+void Renderer::RenderAllFrames(const std::string save_path) {
+    data_.SetFrame(0);
+
+    while(data_.HasNextFrame()){
+        Render(true, save_path);
+        // Clear frame-specific data to be re-evaluated in the next render pass for the next frame.
+        rio_data_.bboxes.clear();
+        rio_data_.instances2truncation.clear();
+        rio_data_.instances2occlusion.clear();
+        
+        // These would not really need to be cleared because currently we save all instances of the scene in each Render pass and not all instances of the scene that are visible only in the current frame.
+        // rio_data_.instance2label.clear();
+        // rio_data_.instance2color.clear();
+        // rio_data_.color2instances.clear();
+    }
 }
 
 }; // namespace RIO

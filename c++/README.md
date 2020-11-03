@@ -66,6 +66,13 @@ Our renderer application additionally requires OpenGL, GLFW3, GLEW, [Assimp](htt
   ./rio_renderer ../../../data/3RScan 754e884c-ea24-2175-8b34-cead19d4198d ./
 ```
 
+Our renderer application offers an additional binary that renders all artifacts (bounding-box file; rendered rgb, label, instance and depth image; occlusion scores for each object) for each frame in a scan:
+
+```bash
+  ./rio_renderer_render_all <3RScan_path> <scan_id> <output_path> <render_only_occlusions> <fov_scale>
+  ./rio_renderer_render_all ../../../data/3RScan 754e884c-ea24-2175-8b34-cead19d4198d ./ 1 2.0
+```
+
 ## Citation
 
 If you find this useful, please consider citing the corresponding publication:

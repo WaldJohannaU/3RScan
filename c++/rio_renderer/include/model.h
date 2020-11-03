@@ -15,6 +15,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <algorithm>
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -30,7 +31,8 @@
 class Model {
 public:
     // Constructor, expects a filepath to a 3D model.
-    Model(const std::string& path) {
+    Model(const std::string& path, const glm::vec3& rgb_color_filter = glm::vec3(-1, -1, -1)): rgb_color_filter_(rgb_color_filter) {
+        use_rgb_color_filter_ = rgb_color_filter_ != glm::vec3(-1, -1, -1);
         this->loadModel(path);
     }
     
@@ -63,7 +65,13 @@ private:
         glBindTexture(GL_TEXTURE_2D, 0);
         return textureID;
     }
-    
+
+    // color filter: only load vertices with this color: when a face contains at least one vertex with this color it is kept, otherwise it is discarded.
+    const glm::vec3 rgb_color_filter_;
+
+    // if the rgb_color_filter should be applied when loading the meshes for this model
+    bool use_rgb_color_filter_{false};
+
     //  Model Data
     std::vector<Mesh> meshes_;
     std::string directory_;
@@ -106,6 +114,8 @@ private:
         std::vector<GLuint> indices;
         std::vector<Texture> textures;
         
+        std::map<GLuint, bool> filteredIndices; // list of indices of all vertices whose color are not the filter color, if colors should be filtered
+
         // Walk through each of the mesh's vertices
         for (GLuint i = 0; i < mesh->mNumVertices; i++) {
             Vertex vertex;
@@ -130,6 +140,10 @@ private:
                 vector.y = mesh->mColors[0][i].g;
                 vector.z = mesh->mColors[0][i].b;
                 vertex.Color = vector;
+                if (use_rgb_color_filter_ && vertex.Color != rgb_color_filter_) {
+                    // if vertex does not have the correct color, filter its index.
+                    filteredIndices[i] = true;
+                }
             }
             // Texture Coordinates
             // Does the mesh contain texture coordinates?
@@ -143,15 +157,40 @@ private:
             }
             else
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-            vertices.push_back(vertex);
+            vertices.push_back(vertex); // we still add filtered vertices since faces reference original indices
         }
         // Now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+
+        // variables for each iteration of the for-loop, instantiated once for reserved memory and higher efficiency
+        bool face_contains_non_filtered_index = false; // at least one index is not filtered in this face?
+        std::vector<GLuint> indices_of_face; // the indices of the current face
+
         for (GLuint i = 0; i < mesh->mNumFaces; i++) {
             aiFace face = mesh->mFaces[i];
+            
             // Retrieve all indices of the face and store them in the indices vector
             for (GLuint j = 0; j < face.mNumIndices; j++) {
-                indices.push_back(face.mIndices[j]);
+                indices_of_face.push_back(face.mIndices[j]);
             }
+
+            // Check if at least one index is not filtered in this face
+            for (const auto& index : indices_of_face) {
+                if (filteredIndices.find(index) == filteredIndices.end() ){
+                    face_contains_non_filtered_index = true;
+                    break;
+                }
+            }
+
+            // Add indices to list if at least one index is not filtered in this face (otherwise ignore the whole face!)
+            if (face_contains_non_filtered_index) {
+                for (const auto& index : indices_of_face) {
+                    indices.push_back(index);
+                }
+            }
+
+            // reset variables for next iteration
+            face_contains_non_filtered_index = false;
+            indices_of_face.clear();
         }
         // Process materials
         if (mesh->mMaterialIndex >= 0) {

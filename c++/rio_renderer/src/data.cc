@@ -26,7 +26,7 @@ void Data::SetFrame(const int frame) {
         frame_id_ = frame;
 }
 
-Data::Data(const std::string& path): data_path_(path) {
+Data::Data(const std::string& path, float fov_scale): data_path_(path), fov_scale_(fov_scale) {
 }
 
 void Data::LoadPose(const std::string& pose_file, Eigen::Matrix4f& pose) {
@@ -78,6 +78,14 @@ const int Data::frame_id() const {
     return frame_id_;
 }
 
+const float Data::fov_scale() const {
+    return fov_scale_;
+}
+
+bool Data::HasNextFrame() const {
+    return frame_id_ < poses_.size();
+}
+
 bool Data::LoadIntrinsics() {
     std::cout << data_path_ << "/" << data_config_.calib_file_ << std::endl;
     std::string line{""};
@@ -93,8 +101,8 @@ bool Data::LoadIntrinsics() {
             else if (line.rfind("m_calibrationColorIntrinsic", 0) == 0) {
                 const std::string model = line.substr(line.find("= ")+2, std::string::npos);
                 const auto parts = funct_utils::split(model, " ");
-                intrinsics.fx = std::stof(parts[0]);
-                intrinsics.fy = std::stof(parts[5]);
+                intrinsics.fx = std::stof(parts[0]) / fov_scale_;
+                intrinsics.fy = std::stof(parts[5]) / fov_scale_;
                 intrinsics.cx = std::stof(parts[2]);
                 intrinsics.cy = std::stof(parts[6]);
             }
