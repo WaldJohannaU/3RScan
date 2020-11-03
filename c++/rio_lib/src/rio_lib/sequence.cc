@@ -44,25 +44,15 @@ bool Sequence::LoadInfoIntrinsics(const std::string& filename,
                                   const bool depth_intrinsics,
                                   RIO::Intrinsics& intrinsics) const {
     const std::string search_tag = depth_intrinsics ? "m_calibrationDepthIntrinsic" : "m_calibrationColorIntrinsic";
-    /*
-     m_colorWidth = 960
-     m_colorHeight = 540
-     m_depthWidth = 224
-     m_depthHeight = 172
-     m_depthShift = 1000
-     m_calibrationColorIntrinsic = 756.832 0 492.889 0 0 756.026 270.419 0 0 0 1 0 0 0 0 1
-     m_calibrationColorExtrinsic = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-     m_calibrationDepthIntrinsic = 176.594 0 114.613 0 0 240.808 85.7915 0 0 0 1 0 0 0 0 1
-     m_calibrationDepthExtrinsic = 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
-     m_frames.size = 467
-    */
+    const std::string search_tag_w = depth_intrinsics? "m_depthWidth":"m_colorWidth";
+    const std::string search_tag_h = depth_intrinsics? "m_depthHeight":"m_colorHeight";
     std::string line{""};
     std::ifstream file(filename);
     if (file.is_open()) {
         while (std::getline(file,line)) {
-            if (line.rfind("m_colorWidth", 0) == 0)
+            if (line.rfind(search_tag_w, 0) == 0)
                 intrinsics.image_width = std::stoi(line.substr(line.find("= ")+2, std::string::npos));
-            else if (line.rfind("m_colorHeight", 0) == 0)
+            else if (line.rfind(search_tag_h, 0) == 0)
                 intrinsics.image_height = std::stoi(line.substr(line.find("= ")+2, std::string::npos));
             else if (line.rfind(search_tag, 0) == 0) {
                 const std::string model = line.substr(line.find("= ")+2, std::string::npos);
