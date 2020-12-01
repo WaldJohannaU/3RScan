@@ -156,14 +156,76 @@ In this repository we provide the project **`rio_renderer`**. The project provid
 
 ![renderer](data/img/frames.png)
 
+### How to render all camera poses at once for one scan in 3RScan?
+The project **`rio_renderer`** provides a predefined executable called **`rio_renderer_render_all`** that renders all camera poses for a given scan in 3RScan. It produces all artifacts that the **`rio_renderer`** creates, for every 
+camera pose (i.e. 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings).
+
 ### How to get the 2D bounding boxes?
 Computing 2D bounding boxes first requires to render the semantic instance image. Based on the 2D instance map, 2D bounding boxes can be derived. We provide example code in **`rio_renderer`**, see **`Get2DBoundingBoxes()`**. The code also save a file **`*.bb.txt`** with the 2D bounding boxes of the current view where each line starts with the instance Id followed by the min / max corners of the bounding box.
+
+### How to filter instances that are barely visible in an image (i.e. occluded)?
+The project **`rio_renderer`** also computes two visibility metrics: occlusion and truncation. For each instance in each rendered image they contain the amount of pixels that are visible, occluded by other instances, and truncated at the image borders. This allows to filter instances based on the degree of occlusion and truncation, i.e. only use an instance that is at most 30% occluded and 20% truncated. In the following we describe the visibility metrics in more detail.
+
+The project **`rio_renderer`** provides the file `frame-xxxxxx.visibility.txt` that is used to store the calculated truncation and occlusion metrics. Its content are rows with following syntax:
+`<instance_id> <truncation_number_pixels_original_image> <truncation_number_pixels_larger_fov_image> <truncation_metric> <occlusion_number_pixels_original_image> <occlusion_number_pixels_only_with_that_instance> <occlusion_metric>` 
+where
+
+- `instance_id`: as defined in `objects.json`
+
+- `truncation_number_pixels_original_image`: how many pixels from instance are visible in the original part of the image when rendered with a larger fov, but only looking at the original crop.
+
+- `truncation_number_pixels_larger_fov_image`: how many pixels from instance are visible in the larger fov image.
+
+- `truncation`: percentage of how much the object is cut off at the edges w.r.t. rendering with larger FOV. 1 means "the whole object is visible in the original image, it is not cut off at image edges". 0<x<1 means "the object is visible to x% in the original image, the rest is cut off at image edges but is visible with a larger FOV".
+
+- `occlusion_number_pixels_original_image`: how many pixels from instance are visible in original image with original fov.
+
+- `occlusion_number_pixels_only_with_that_instance`: how many pixels from instance are visible in original image with original fov when only rendering that instance.
+
+- `occlusion`: percentage of how much the object is cut off by other objects in the original image (without larger FOV). 1 means "the whole object is visible in the original image, it is not cut off by other objects in the image". 0<x<1 means "the object is visible to x% in the original image, the rest is cut off by other objects in the image, but is visible in the original FOV when only rendering that single object"
+
+**Caveat:** Note that `truncation_number_pixels_original_image` and `occlusion_number_pixels_original_image` are not the same number. This is because we used a larger FOV for rendering the image in truncation and therefore the absolute number of pixels is less because we look at a smaller width/height in total. When using the number of pixels as object mask, we should therefore use the `occlusion_number_pixels_original_image`.
+
+One example `frame-xxxxxx.visibility.txt` file can look like this:
+
+```
+1 39326 76215 0.515988 158780 268173 0.59208
+2 10764 108274 0.0994144 41363 67629 0.611616
+17 2663 6377 0.417594 10974 18437 0.595216
+18 3190 3190 1 12769 12770 0.999922
+19 36676 37854 0.96888 146999 146999 1
+22 12373 187178 0.0661029 56761 56761 1
+24 4345 20030 0.216925 14900 14900 1
+25 13322 13325 0.999775 53334 56449 0.944817
+28 2171 8714 0.249139 7958 8392 0.948284
+33 2149 8319 0.258324 8267 8297 0.996384
+```
+
+These files get computed when calling the executable `rio_renderer_render_all` this way:
+
+`./rio_renderer_render_all <data_path> <scan_id> <render_output> <render_only_occlusions> <fov_scale>`
+
+e.g.
+
+`./rio_renderer_render_all /path/to/3RScan/ 5630cfc9-12bf-2860-84ed-5bb189f0e94e /path/to/3RScan/tmpOutputDir 1 2.0`
+
+where:
+
+- `render_only_occlusions`: if only the `frame-xxxxxx.visibility.txt` files should be created (int value). If 0: also the other images will be rendered with the normal fov setting and saved (i.e. 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings). If 1: only the new file will be saved to disk. (default: 0)
+- `fov_scale`: enlargement factor, e.g. 2.0 means that the enlarged image will have a twice as large FOV (default: 2.0)
+
+You need to specify both arguments `<render_only_occlusions> <fov_scale>` for the current implementation to use any of them.
 
 ### Why do the number of vertices in the .obj and .ply differ?
 The reason for this is the annotation interface / segmentation code that we used to get the labels. However, the number of faces is the same, see **`ExportModel`** on how to extract the 3D model of a specific instance from the 3D mesh.
 
 ### Some scenes in 3RScan seem to be quite small / partial, why's that?
 Some scans (mostly rescans) are indeed quite small due to issues when processing the data on the phone or our servers. While this only affects a small number of scans, we still decided to provide the scans scince it might be useful for some tasks. Feel free to skip them if it’s not useful for you, a list of rather small scans are available [here](http://campar.in.tum.de/files/3RScan/partial.txt).
+
+### Are there example projects that use this dataset?
+You can have a look at the following project, that utilizes the 3RScan dataset and its project **`rio_renderer`** to create a triplet network in PyTorch. It also uses many rendering artifacts (i.e. 2D semantic images (colors and 16 bit instance images), RGB color renderings, bounding-box and visibility files) and provides an example pipeline that utilizes that type of data.
+
+https://github.com/lukasHoel/3rscan-triplet-dataset-toolkit 
 
 ## Something is still unclear ...
 If this didn't answer your question or you still have some problem that goes beyond these FAQ, please don't hesitate to contact me via [johanna.wald@tum.de](mailto:johanna.wald@tum.de).
