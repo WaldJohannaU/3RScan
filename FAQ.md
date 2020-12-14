@@ -27,6 +27,9 @@ All the other remaining scans are the rescans, **`scene["reference"]["scans"]`**
   rio.IsRescan(scan_id); // retruns true if scan_id is a rescan
 ```
 
+#### How to determine if a scan belongs to the train, val or test split?
+Each scene with the reference and all corresponding rescans in [**`3RScan.json`**](http://campar.in.tum.de/files/3RScan/3RScan.json) are assigned a split, see **`type`** field in json file. We also provide a list of ids here: [**`splits`**](https://github.com/WaldJohannaU/3RScan/tree/master/splits). Please note that these files only include references. A full list of scan ids including rescans can be found here: [**`train`**](http://campar.in.tum.de/files/3RScan/train_scans.txt), [**`val`**](http://campar.in.tum.de/files/3RScan/val_scans.txt), [**`test`**](http://campar.in.tum.de/files/3RScan/test_scans.txt).
+
 #### How to align the rescan 3D models and camera poses with the reference scan?
 Scene-to-scene transformations to align the 3D maps are available in the json-metafile [**`3RScan.json`**](http://campar.in.tum.de/files/3RScan/3RScan.json). Please note that the transformation of the translation in the json file is in millimeter while the 3D models are stored in meters. We provide the function **`Transform2Reference()`** as an example on how to use those in our **`rio_example`** project. The same procedure applies when aligning the ground truth trajectories, see function **`GetCameraPose()`**.
 
@@ -223,6 +226,9 @@ The reason for this is the annotation interface / segmentation code that we used
 Some scans (mostly rescans) are indeed quite small due to issues when processing the data on the phone or our servers. While this only affects a small number of scans, we still decided to provide the scans scince it might be useful for some tasks. Feel free to skip them if it’s not useful for you, a list of rather small scans are available [here](http://campar.in.tum.de/files/3RScan/partial.txt).
 
 ### Are there example projects that use this dataset?
+Check out [**`google-research/tf3d`**](https://github.com/google-research/google-research/tree/master/tf3d) for 3D semantic / instance segmentation code with tensorflow. The corresponding **`*.tfrecords`** can be obtained via our download script (using the **`--type=tfrecords`** flag).
+
+
 You can have a look at the following project, that utilizes the 3RScan dataset and its project **`rio_renderer`** to create a triplet network in PyTorch. It also uses many rendering artifacts (i.e. 2D semantic images (colors and 16 bit instance images), RGB color renderings, bounding-box and visibility files) and provides an example pipeline that utilizes that type of data.
 
 https://github.com/lukasHoel/3rscan-triplet-dataset-toolkit 
