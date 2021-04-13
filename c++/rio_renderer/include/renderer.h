@@ -32,7 +32,8 @@ public:
              const std::string& scan_id,
              bool save_images_and_bbox = true,
              bool save_occlusion = false,
-             float fov_scale = 1.0f);
+             float fov_scale = 1.0f,
+             bool v2 = true);
     ~Renderer();
     int Init();
     void Render(const bool inc_frame_id, const std::string save_path = "");
@@ -101,6 +102,7 @@ private:
     Model* model_RGB_{nullptr};
     Model* model_labels_{nullptr};
     std::map<int, Model*> instance2model_with_instance_only_;
+    bool v2_{true};
 
     void InitGLFW();
     void Render(Model& model, Shader& shader);

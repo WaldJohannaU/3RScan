@@ -11,11 +11,12 @@ Renderer::Renderer(const std::string& sequence_path,
                    const std::string& scan_id,
                    bool save_images_and_bbox,
                    bool save_occlusion,
-                   float fov_scale): 
+                   float fov_scale,
+                   bool v2): 
                    data_path_(data_path), sequence_path_(sequence_path),
                    rio_data_(scan_id),  data_(sequence_path), data_fov_scale_(sequence_path, fov_scale),
                    save_images_and_bbox_(save_images_and_bbox),
-                   save_occlusion_(save_occlusion) {
+                   save_occlusion_(save_occlusion), v2_(v2) {
 }
 
 Renderer::~Renderer() {
@@ -72,9 +73,10 @@ int Renderer::Init() {
     shader_RGB_ = new Shader("../res/textured3D.vs", "../res/textured3D.frag");
 
     // load models with all objects in it
-    model_labels_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated.ply");
-    if(save_images_and_bbox_){
-        model_RGB_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/mesh.refined.obj");
+    const std::string file_prefix = v2_ ? ".v2" : "";
+    model_labels_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated" + file_prefix + ".ply");
+    if(save_images_and_bbox_) {
+        model_RGB_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/mesh.refined" + file_prefix + ".obj");
     }
 
     // load models with just one instance visible

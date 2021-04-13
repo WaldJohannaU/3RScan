@@ -51,14 +51,14 @@ The color and depth images are calibrated (you do not need to do this manually),
 There are quite some files to possibly parse to get the semantic labels, you have many options depending on what you want to do in your code. Let's answer some of the question you might have:
 
 ### The ply files seem to be binary - how do I read them?
-The ply files are indeed stored as binary. Our code provides a function **`ReSavePLYASCII()`** that uses **`tinyply`** to load the binary ply and to save it in ASCII format. 
+The ply files of the first version of our dataset are indeed stored as binary. Our code provides a function **`ReSavePLYASCII()`** that uses **`tinyply`** to load the binary ply and to save it in ASCII format. The files in v2 the data is stored as ascii.
 
 ### How do I get the semantic labels?
-There are two ways to extract the semantic class of each 3D point: either via the **`semseg.json`** or via [**`objects.json`**](http://campar.in.tum.de/files/3DSSG/3DSSG/objects.json). The function **`PrintSemanticLabels()`** shows simple code to print these labels for a specific scene. A **`semseg.json`** is provided per scan as follows:
+There are two ways to extract the semantic class of each 3D point: either via the **`semseg.v2.json`** or via [**`objects.json`**](http://campar.in.tum.de/files/3DSSG/3DSSG/objects.json). The function **`PrintSemanticLabels()`** shows simple code to print these labels for a specific scene. A **`semseg.v2.json`** is provided per scan as follows:
 
 ```javascript
 {
-  "sceneId": "tangonet.8eabc405-5af7-2f32-86d2-d757fa7b019d",
+  "scan_id": "8eabc405-5af7-2f32-86d2-d757fa7b019d",
   ...
   "segGroups": [
     {
@@ -85,12 +85,11 @@ There are two ways to extract the semantic class of each 3D point: either via th
     }
 ```
 
-In **`semseg.json`**, **`json["segGroups"]`** is the list of instances in this particular scene with **`objectId`** or **`Id`** being the instance id of a specific object instance in the 3D scene and label being the assigned semantic label. The 3D geometry of the objects is stored in **`labels.instances.annotated.ply`** - the **`objectId`** of each 3D vertex is stored in a costum vertex property, see header: 
+In **`semseg.v2.json`**, **`json["segGroups"]`** is the list of instances in this particular scene with **`objectId`** or **`Id`** being the instance id of a specific object instance in the 3D scene and label being the assigned semantic label. The 3D geometry of the objects is stored in **`labels.instances.annotated.v2.ply`** - the **`objectId`** of each 3D vertex is stored in a costum vertex property, see header: 
 
 ```javascript
 ply
-format binary_little_endian 1.0
-comment STK generated
+format ascii 1.0
 element vertex 83385
 property float x
 property float y
@@ -98,8 +97,11 @@ property float z
 property uchar red
 property uchar green
 property uchar blue
-property uint16 objectId  // that is the objectId that maps to the objectId in semseg.json
-...
+property ushort objectId // that is the objectId that maps to the objectId in semseg.v2.json
+property ushort globalId
+property uchar NYU40
+property uchar Eigen13
+property uchar RIO27
 element face 27795
 property list uchar int vertex_indices
 end_header
@@ -143,25 +145,24 @@ On the other hand, **`objects.json`** provides the labels for all scenes parsed 
 ```
 
 ### How to map this to a global instance Id?
-Please note that the **`objectId`** is scene specific (1 might be the floor in one scene but could be a sofa in another). To get a 3D semantic segmentation with a consistnt, global instance ID check out the function **`RemapLabelsPly()`**. The global instance ID produced here in a **`*.ply`** (check header) is the same as the **`global_id`** in **`objects.json`**.
+Please note that the **`objectId`** is scene specific (1 might be the floor in one scene but could be a sofa in another). To get a 3D semantic segmentation with a consistent, global instance ID check out the function **`RemapLabelsPly()`**. The global instance ID produced here in a **`*.ply`** (check header) is the same as the **`global_id`** in **`objects.json`**.
 
 ## Advanced 2D or 3D Processing
 You might want to do some more complex processing; check out the following FAQ about 2D / 3D processing with 3RScan:
 
 ### How to get 3D bounding boxes?
-It's easy: Our **`semseg.json`** provides oriented bounding boxes (you simply need to read **`json["segGroups"]["obb"]`**). Detailed instructions on how to get the 2D bounding boxes can be found below. 
+It's easy: Our **`semseg.v2.json`** provides oriented bounding boxes (you simply need to read **`json["segGroups"]["obb"]`**). Detailed instructions on how to get the 2D bounding boxes can be found below. 
 
 ### Backproject: How to get a 3D point cloud from a given depth image?
 As described above (see **Dataformat**) the color and depth images are calibrated. The intrinscis and the RGB and depth image can be found in **`_info.txt`**. An example on how to read and backproject them to get a colored 3D point cloud is shown in our example code using the function **`Backproject(scan, frame_id)`**. The produced colored 3D point cloud aligns with the 3D reconstructions **`*.obj`** and **`*.ply`**.
 
 ### How to render scans in 3RScan?
-In this repository we provide the project **`rio_renderer`**. The project provides an OpenGL renderer **`RIO::Renderer`** and a corresponding rendering function **`render()`** to produce 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings. The rendering function is designed to work with 3RScan and uses the intrinsics **`m_calibrationColorIntrinsic`** in **`_info.txt`** and the 3D models mesh.refined.obj and **`labels.instances.annotated.ply`** to render the corresponding 2D images. The code generates the following files:
+In this repository we provide the project **`rio_renderer`**. The project provides an OpenGL renderer **`RIO::Renderer`** and a corresponding rendering function **`render()`** to produce 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings. The rendering function is designed to work with 3RScan and uses the intrinsics **`m_calibrationColorIntrinsic`** in **`_info.txt`** and the 3D models **`mesh.refined.v2.obj`** and **`labels.instances.annotated.v2.ply`** to render the corresponding 2D images. The code generates the following files:
 
 ![renderer](data/img/frames.png)
 
 ### How to render all camera poses at once for one scan in 3RScan?
-The project **`rio_renderer`** provides a predefined executable called **`rio_renderer_render_all`** that renders all camera poses for a given scan in 3RScan. It produces all artifacts that the **`rio_renderer`** creates, for every 
-camera pose (i.e. 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings).
+The project **`rio_renderer`** provides a predefined executable called **`rio_renderer_render_all`** that renders all camera poses for a given scan in 3RScan. It produces all the data that the **`rio_renderer`** creates, for every camera pose i.e. 2D semantic images (colors and 16 bit instance images), 16 bit depth images or RGB color renderings.
 
 ### How to get the 2D bounding boxes?
 Computing 2D bounding boxes first requires to render the semantic instance image. Based on the 2D instance map, 2D bounding boxes can be derived. We provide example code in **`rio_renderer`**, see **`Get2DBoundingBoxes()`**. The code also save a file **`*.bb.txt`** with the 2D bounding boxes of the current view where each line starts with the instance Id followed by the min / max corners of the bounding box.
@@ -179,13 +180,13 @@ where
 
 - `truncation_number_pixels_larger_fov_image`: how many pixels from instance are visible in the larger fov image.
 
-- `truncation`: percentage of how much the object is cut off at the edges w.r.t. rendering with larger FOV. 1 means "the whole object is visible in the original image, it is not cut off at image edges". 0<x<1 means "the object is visible to x% in the original image, the rest is cut off at image edges but is visible with a larger FOV".
+- `truncation`: percentage of how much the object is cut off at the edges w.r.t. rendering with larger FOV. 1 means _the whole object is visible in the original image, it is not cut off at image edges_. 0 < x < 1 means _the object is visible to x% in the original image, the rest is cut off at image edges but is visible with a larger FOV_.
 
 - `occlusion_number_pixels_original_image`: how many pixels from instance are visible in original image with original fov.
 
 - `occlusion_number_pixels_only_with_that_instance`: how many pixels from instance are visible in original image with original fov when only rendering that instance.
 
-- `occlusion`: percentage of how much the object is cut off by other objects in the original image (without larger FOV). 1 means "the whole object is visible in the original image, it is not cut off by other objects in the image". 0<x<1 means "the object is visible to x% in the original image, the rest is cut off by other objects in the image, but is visible in the original FOV when only rendering that single object"
+- `occlusion`: percentage of how much the object is cut off by other objects in the original image (without larger FOV). 1 means "the whole object is visible in the original image, it is not cut off by other objects in the image". 0 < x < 1 means _the object is visible to x% in the original image, the rest is cut off by other objects in the image, but is visible in the original FOV when only rendering that single object_
 
 **Caveat:** Note that `truncation_number_pixels_original_image` and `occlusion_number_pixels_original_image` are not the same number. This is because we used a larger FOV for rendering the image in truncation and therefore the absolute number of pixels is less because we look at a smaller width/height in total. When using the number of pixels as object mask, we should therefore use the `occlusion_number_pixels_original_image`.
 
@@ -220,10 +221,13 @@ where:
 You need to specify both arguments `<render_only_occlusions> <fov_scale>` for the current implementation to use any of them.
 
 ### Why do the number of vertices in the .obj and .ply differ?
-The reason for this is the annotation interface / segmentation code that we used to get the labels. However, the number of faces is the same, see **`ExportModel`** on how to extract the 3D model of a specific instance from the 3D mesh.
+The reason for this is the annotation interface / segmentation code that we used to get the labels. However, the number of faces is the same, see **`TransformInstance`** on how to extract the 3D model of a specific instance from the 3D mesh. In v2 of the dataset **`mesh_refined.v2.obj`** and **`labels.instances.annotated.v2.ply`** have the same number of vertices.
 
 ### Some scenes in 3RScan seem to be quite small / partial, why's that?
 Some scans (mostly rescans) are indeed quite small due to issues when processing the data on the phone or our servers. While this only affects a small number of scans, we still decided to provide the scans scince it might be useful for some tasks. Feel free to skip them if it’s not useful for you, a list of rather small scans are available [here](http://campar.in.tum.de/files/3RScan/partial.txt).
+
+### What is the difference between v1 and v2 of the dataset?
+In v2 the labels and annotations are cleaned, we removed typos in the semantic labels and minimal changes in the 3D annotation. We additionally adjusted the 3D models by excluding vertices, faces or segments that were annotated with the class _remove_ from the mesh, the semantic segmentation, the corresponding over-segmentation and the labelled 3D model. The **`labels.instances.annotated.v2.ply`** files are saved as ASCII and the number of vertices is now the same as in the **`*.obj`** file. Please also note the [mapping](https://docs.google.com/spreadsheets/d/1eRTJ2M9OHz7ypXfYD-KTR1AIT-CrVLmhJf8mxgVZWnI/edit?usp=sharing) and the vertex properties of the **`*.ply`** file: objectId (instance ID), globalId (global 3RScan mapping) and its semantic mappings to NYU40, Eigen13 and RIO27.
 
 ### Are there example projects that use this dataset?
 Check out [**`google-research/tf3d`**](https://github.com/google-research/google-research/tree/master/tf3d) for 3D semantic / instance segmentation code with tensorflow. The corresponding **`*.tfrecords`** can be obtained via our download script (using the **`--type=tfrecords`** flag).

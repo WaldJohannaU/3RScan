@@ -22,10 +22,10 @@ This downloads a rescan and it's corresponding reference and prepares the requir
 │	│	│	│	├── frame-000000.depth.pgm
 │	│	│	│	├── frame-000000.pose.txt
 │	│	│	│	└── ...
-│	│	│	├── labels.instances.annotated.ply
-│	│	│	├── mesh.refined.obj
+│	│	│	├── labels.instances.annotated.v2.ply
+│	│	│	├── mesh.refined.v2.obj
 │	│	│	├── mesh.refined_0.png
-│	│	│	└── semseg.json
+│	│	│	└── semseg.v2.json
 │	│	└── 754e884c-ea24-2175-8b34-cead19d4198d
 │	├── 3RScan.json
 │	└── objects.json
@@ -34,7 +34,7 @@ This downloads a rescan and it's corresponding reference and prepares the requir
 
 ## 3RScan Library Dependencies
 
-[OpenCV](https://github.com/opencv/opencv) and [Eigen](https://github.com/libigl/eigen) are required in order to be able to compile and run our example code. You can either build the dependencies from source or use the package manager of your choice e.g. ``brew`` on macOS to install the packages. Once you installed OpenCV and Eigen simply run:
+[OpenCV](https://github.com/opencv/opencv) and [Eigen](https://github.com/libigl/eigen) are required in order to be able to compile and run our example code. You can either build the dependencies from source or use the package manager of your choice e.g. ``brew`` on macOS to install the packages. Once you installed OpenCV and Eigen run:
 
 ```bash
   cd rio_lib
@@ -51,7 +51,7 @@ To run the sample application simply do:
   ./bin/rio_example ../../../data/3RScan 754e884c-ea24-2175-8b34-cead19d4198d
 ```
 
-Our renderer application additionally requires OpenGL, GLFW3, GLEW, [Assimp](https://github.com/assimp/assimp) and glm. Once installed, it also builds as follows:
+Our renderer application additionally requires OpenGL, GLFW3, GLEW, [Assimp](https://github.com/assimp/assimp) and glm (libglfw3-dev, libglew-dev, libassimp-dev and libglm-dev). Once installed, it also builds as follows:
 
 ```bash
   cd rio_renderer

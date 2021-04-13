@@ -31,7 +31,7 @@ The data in 3RScan is organized by RGB-D sequence. Each sequence has a unique ha
 
 ```
 <scanId>
-|-- mesh.refined.obj
+|-- mesh.refined.v2.obj
     Reconstructed mesh
 |-- mesh.refined.mtl
     Corresponding material file 
@@ -39,11 +39,11 @@ The data in 3RScan is organized by RGB-D sequence. Each sequence has a unique ha
     Corresponding mesh texture
 |-- sequence.zip
     Calibrated RGB-D sensor stream with color and depth frames, camera poses
-|-- labels.instances.annotated.ply
+|-- labels.instances.annotated.v2.ply
     Visualization of semantic segmentation
-|-- mesh.refined.0.010000.segs.json
+|-- mesh.refined.0.010000.segs.v2.json
     Over-segmentation of annotation mesh
-|-- semseg.json
+|-- semseg.v2.json
     Instance segmentation of the mesh (contains the labels)
 ```
 
@@ -57,10 +57,10 @@ OBJ format mesh with +Z axis in upright orientation.
 **RGB-D sensor data (`*.zip`)**:
 ZIP-archive with per-frame color, depth, camera pose and camera intrinsics.
 
-**Instance segmentation of the mesh (`semseg.json`)**:
+**Instance segmentation of the mesh (`semseg.v2.json`)**:
 ```javascript
 {
-  "sceneId": "tangonet.8eabc405-5af7-2f32-86d2-d757fa7b019d",
+  "scan_id": "8eabc405-5af7-2f32-86d2-d757fa7b019d",
   ...
   "segGroups": [
     {
@@ -134,5 +134,5 @@ For examples on how to read these files or how to use 3RScan in general see our 
 
 ## Notes
 * Training Data: You can find the train, test and validation splits here: [[train](splits/train.txt), [val](splits/val.txt), [test](splits/test.txt)]
-* Segmentation format (surface mesh segmentation and aggregated semantic annotation) is the same as in [ScanNet](https://github.com/ScanNet/ScanNet)
+* Segmentation format (surface mesh segmentation and aggregated semantic annotation) is similar to [ScanNet](https://github.com/ScanNet/ScanNet)
 * Please see our [project page](https://waldjohannau.github.io/RIO) for more information.

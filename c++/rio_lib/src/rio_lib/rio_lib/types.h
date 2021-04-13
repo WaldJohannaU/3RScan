@@ -32,14 +32,22 @@ struct PlyData {
 };
 
 struct RIOPlyData {
+    bool v2 = true;
+
     std::vector<float> vertices;
     std::vector<uint8_t> colors;
     std::vector<uint32_t> faces;
     std::vector<uint16_t> global_ids;
     std::vector<uint16_t> object_ids;
+    // v1 properties
     std::vector<uint16_t> category_ids;
     std::vector<uint8_t> raw_nyu40;
     std::vector<uint8_t> raw_mpr40;
+    // v2 properties
+    std::vector<uint8_t> NYU40;
+    std::vector<uint8_t> Eigen13;
+    std::vector<uint8_t> RIO27;
+
     const bool save(const std::string& filename, const bool ascii);
     const uint32_t load(const std::string filename);
 };

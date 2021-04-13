@@ -16,11 +16,11 @@ struct DataConfig {
     const std::string json_file{"3RScan.json"};
     const std::string objects_json_file{"objects.json"};
     
-    const std::string mesh{"mesh.refined"};
+    const std::string mesh{"mesh.refined.v2"};
     const std::string texture{"mesh.refined_0.png"};
-    const std::string instances{"labels.instances.annotated"};
+    const std::string instances{"labels.instances.annotated.v2"};
 
-    const std::string semseg{"semseg.json"};
+    const std::string semseg{"semseg.v2.json"};
 
     DataConfig(const std::string& base_path): base_path(base_path) { }
 

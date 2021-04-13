@@ -24,9 +24,6 @@ int main(int argc, char **argv) {
     const bool is_reference = rio.IsReference(scan_id);
     // get reference scan id for a given rescan id
     const std::string reference_id = rio.GetReference(scan_id);
-    // re-save binary encoded labels.instances.annotated.ply as ASCII file
-    // this creates a labels.instances.annotated.ascii.ply in data_path/scan_id
-    rio.ReSavePLYASCII(scan_id);
     // transforms *.obj and *.ply to be aligned to the reference.
     if (is_rescan)
         rio.Transform2Reference(scan_id);
