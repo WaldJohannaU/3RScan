@@ -9,13 +9,16 @@ namespace RIO {
 Renderer::Renderer(const std::string& sequence_path, 
                    const std::string& data_path, 
                    const std::string& scan_id,
-                   bool save_images_and_bbox,
-                   bool save_occlusion,
+                   const bool save_images,
+                   const bool save_depth,
+                   const bool save_bounding_boxes,
+                   const bool save_occlusion,
                    float fov_scale,
                    bool v2): 
                    data_path_(data_path), sequence_path_(sequence_path),
-                   rio_data_(scan_id),  data_(sequence_path), data_fov_scale_(sequence_path, fov_scale),
-                   save_images_and_bbox_(save_images_and_bbox),
+                   rio_data_(scan_id), data_(sequence_path), data_fov_scale_(sequence_path, fov_scale),
+                   save_images_(save_images), save_depth_(save_depth),
+                   save_bounding_boxes_(save_bounding_boxes),
                    save_occlusion_(save_occlusion), v2_(v2) {
 }
 
@@ -75,12 +78,12 @@ int Renderer::Init() {
     // load models with all objects in it
     const std::string file_prefix = v2_ ? ".v2" : "";
     model_labels_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated" + file_prefix + ".ply");
-    if(save_images_and_bbox_) {
+    if (save_depth_ || save_images_ || save_bounding_boxes_) {
         model_RGB_ = new Model(data_path_ + "/" + rio_data_.scan_id + "/mesh.refined" + file_prefix + ".obj");
     }
 
     // load models with just one instance visible
-    if(save_occlusion_){
+    if (save_occlusion_) {
         LoadObjects(data_path_ + "/objects.json"); // load this now because we need it now (otherwise it is loaded in first render call)
         for (const auto& i2c: rio_data_.instance2color) {
             const int instance_id = i2c.first;
@@ -93,7 +96,7 @@ int Renderer::Init() {
 
             // create model with only the current instance visible
             glm::vec3 rgb(r / 255.0f, g / 255.0f, b / 255.0f); // required to be in [0..1] scale because this is how the colors are defined in the mesh file
-            Model* model_label_one_instance_only = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated.ply", rgb);
+            Model* model_label_one_instance_only = new Model(data_path_ + "/" + rio_data_.scan_id + "/labels.instances.annotated" + file_prefix + ".ply", rgb);
             instance2model_with_instance_only_[instance_id] = model_label_one_instance_only;
         }
     }
@@ -123,33 +126,39 @@ void Renderer::Render(const bool inc_frame_id, const std::string save_path) {
     // this is needed for both saving cases so always render it
     DrawScene(*model_labels_, *shader_labels_);
     ReadLabels(rio_data_.labels, rio_data_.instances);
-
-    if (save_path != "" && (save_images_and_bbox_ || save_occlusion_)) {
+    if (save_path != "" && (save_depth_ || save_images_ || save_bounding_boxes_ || save_occlusion_)) {
         std::stringstream filename;
         filename << save_path << "/frame-" << std::setfill('0') << std::setw(6) << data_.frame_id();
 
         // render + save rendered color, depth, label, instance images and the bbox file.
-        if(save_images_and_bbox_){
+        if (save_depth_ || save_images_ || save_bounding_boxes_) {
             // only now are the rgb and depth images needed
             DrawScene(*model_RGB_, *shader_RGB_);
             ReadRGB(rio_data_.color);
             ReadDepth(rio_data_.depth);
-
-            cv::imwrite(filename.str() + ".rendered.color.jpg", rio_data_.color);
-            cv::imwrite(filename.str() + ".rendered.depth.png", rio_data_.depth);
-            cv::imwrite(filename.str() + ".rendered.labels.png", rio_data_.labels);
-            cv::imwrite(filename.str() + ".rendered.instances.png", rio_data_.instances);
-            std::ofstream outfile(filename.str() + ".bb.txt");
-            for (const auto& bb: rio_data_.bboxes) {
-                const Eigen::Vector4i& box = bb.second;
-                if (rio_data_.instance2label.find(bb.first) != rio_data_.instance2label.end()) 
-                    outfile << bb.first << " " << box(0) << " " << box(1) << " " << box(2) << " " << box(3) << std::endl;
+            if (save_depth_) {
+                if (!cv::imwrite(filename.str() + ".rendered.depth.png", rio_data_.depth))
+                    throw std::system_error(errno, std::system_category(), "failed to write " + save_path);
             }
-            outfile.close();
+            if (save_images_) {
+                if (!cv::imwrite(filename.str() + ".rendered.color.jpg", rio_data_.color) |
+                    !cv::imwrite(filename.str() + ".rendered.labels.png", rio_data_.labels) |
+                    !cv::imwrite(filename.str() + ".rendered.instances.png", rio_data_.instances))
+                    throw std::system_error(errno, std::system_category(), "failed to write " + save_path);
+            }
+            if (save_bounding_boxes_) {
+                std::ofstream outfile(filename.str() + ".bb.txt");
+                for (const auto& bb: rio_data_.bboxes) {
+                    const Eigen::Vector4i& box = bb.second;
+                    if (rio_data_.instance2label.find(bb.first) != rio_data_.instance2label.end()) 
+                        outfile << bb.first << " " << box(0) << " " << box(1) << " " << box(2) << " " << box(3) << std::endl;
+                }
+                outfile.close();
+            }
         }
 
         // render + save the occlusion score for each object instance id
-        if(save_occlusion_){
+        if (save_occlusion_) {
             // use original intrinsics for calculating occlusion
             CalcOcclusions(rio_data_.instance2color, rio_data_.instances2occlusion, rio_data_.labels);
 
@@ -347,9 +356,9 @@ void Renderer::CalcTruncations(std::map<int, unsigned long>& instances2color, st
         // Only instances that are visible will be added to the truncation list for this frame.
         const bool valid_instance = number_pixels_large > 0 && number_pixels_small > 0; 
 
-        if(valid_instance){
+        if (valid_instance) {
             instances2truncation[instance_id] = Renderer::VisibilityEntry(static_cast<float>(number_pixels_small),
-                                                                            static_cast<float>(number_pixels_large));
+                                                                          static_cast<float>(number_pixels_large));
         }
     }
     
@@ -425,8 +434,7 @@ void Renderer::VerifyTruncationAndOcclusion(std::map<int, Renderer::VisibilityEn
 
 void Renderer::RenderAllFrames(const std::string save_path) {
     data_.SetFrame(0);
-
-    while(data_.HasNextFrame()){
+    while (data_.HasNextFrame()){    
         Render(true, save_path);
         // Clear frame-specific data to be re-evaluated in the next render pass for the next frame.
         rio_data_.bboxes.clear();

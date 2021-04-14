@@ -30,7 +30,9 @@ public:
     Renderer(const std::string& sequence_path, 
              const std::string& data_path, 
              const std::string& scan_id,
-             bool save_images_and_bbox = true,
+             bool save_images = true,
+             bool save_depth = true,
+             bool save_bounding_boxes = false,
              bool save_occlusion = false,
              float fov_scale = 1.0f,
              bool v2 = true);
@@ -66,7 +68,9 @@ private:
     std::string sequence_path_{""};
     int buffer_width{0};
     int buffer_height{0};
-    bool save_images_and_bbox_{true};
+    bool save_images_{true};
+    bool save_depth_{true};
+    bool save_bounding_boxes_{false};
     bool save_occlusion_{false};
     bool initalized_{false};
     struct RIOData {

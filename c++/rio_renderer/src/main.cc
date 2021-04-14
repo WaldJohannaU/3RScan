@@ -17,8 +17,9 @@ int main (int argc, char* argv[]) {
         return 0;
     const std::string data_path{argv[1]}; 
     const std::string scan_id{argv[2]}; 
-    const std::string output_path{argv[3]}; 
+    const std::string output_folder{argv[3]}; 
     const std::string seq_path = data_path + "/" + scan_id + "/sequence/";
+    const std::string output_path = data_path + "/" + scan_id + "/" + output_folder + "/";
     RIO::Renderer renderer(seq_path, data_path, scan_id);
     renderer.Init();
     renderer.Render(28, output_path);

@@ -168,9 +168,9 @@ The project **`rio_renderer`** provides a predefined executable called **`rio_re
 Computing 2D bounding boxes first requires to render the semantic instance image. Based on the 2D instance map, 2D bounding boxes can be derived. We provide example code in **`rio_renderer`**, see **`Get2DBoundingBoxes()`**. The code also save a file **`*.bb.txt`** with the 2D bounding boxes of the current view where each line starts with the instance Id followed by the min / max corners of the bounding box.
 
 ### How to filter instances that are barely visible in an image (i.e. occluded)?
-The project **`rio_renderer`** also computes two visibility metrics: occlusion and truncation. For each instance in each rendered image they contain the amount of pixels that are visible, occluded by other instances, and truncated at the image borders. This allows to filter instances based on the degree of occlusion and truncation, i.e. only use an instance that is at most 30% occluded and 20% truncated. In the following we describe the visibility metrics in more detail.
+The project **`rio_renderer_render_all`** also computes two visibility metrics: occlusion and truncation. For each instance in each rendered image they contain the amount of pixels that are visible, occluded by other instances, and truncated at the image borders. This allows to filter instances based on the degree of occlusion and truncation, i.e. only use an instance that is at most 30% occluded and 20% truncated. In the following we describe the visibility metrics in more detail.
 
-The project **`rio_renderer`** provides the file `frame-xxxxxx.visibility.txt` that is used to store the calculated truncation and occlusion metrics. Its content are rows with following syntax:
+It provides the file `frame-xxxxxx.visibility.txt` that is used to store the calculated truncation and occlusion metrics. Its content are rows with following syntax:
 `<instance_id> <truncation_number_pixels_original_image> <truncation_number_pixels_larger_fov_image> <truncation_metric> <occlusion_number_pixels_original_image> <occlusion_number_pixels_only_with_that_instance> <occlusion_metric>` 
 where
 
@@ -207,18 +207,15 @@ One example `frame-xxxxxx.visibility.txt` file can look like this:
 
 These files get computed when calling the executable `rio_renderer_render_all` this way:
 
-`./rio_renderer_render_all <data_path> <scan_id> <render_output> <render_only_occlusions> <fov_scale>`
+`./rio_renderer_render_all <data_path> <scan_id> <output_folder> <render_mode>`
 
 e.g.
 
-`./rio_renderer_render_all /path/to/3RScan/ 5630cfc9-12bf-2860-84ed-5bb189f0e94e /path/to/3RScan/tmpOutputDir 1 2.0`
+`./rio_renderer_render_all /path/to/3RScan/ 5630cfc9-12bf-2860-84ed-5bb189f0e94e sequence 0`
 
-where:
+where the render mode 0 saves images, bounding box and occlusion / truncation, 1 only images, 2 only depth maps, 3 additionally bounding boxes and 4, only bounding boxes.
 
-- `render_only_occlusions`: if only the `frame-xxxxxx.visibility.txt` files should be created (int value). If 0: also the other images will be rendered with the normal fov setting and saved (i.e. 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings). If 1: only the new file will be saved to disk. (default: 0)
-- `fov_scale`: enlargement factor, e.g. 2.0 means that the enlarged image will have a twice as large FOV (default: 2.0)
-
-You need to specify both arguments `<render_only_occlusions> <fov_scale>` for the current implementation to use any of them.
+- In mode 0 `frame-xxxxxx.visibility.txt` are created. It also renders the images with the default fov setting (i.e. 2D semantic images (colors and 16 bit instance images), 16bit depth images or RGB color renderings). If you just want to render the 2D images, option 1 is best for you.
 
 ### Why do the number of vertices in the .obj and .ply differ?
 The reason for this is the annotation interface / segmentation code that we used to get the labels. However, the number of faces is the same, see **`TransformInstance`** on how to extract the 3D model of a specific instance from the 3D mesh. In v2 of the dataset **`mesh_refined.v2.obj`** and **`labels.instances.annotated.v2.ply`** have the same number of vertices.

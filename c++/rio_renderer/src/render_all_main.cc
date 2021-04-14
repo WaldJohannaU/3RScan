@@ -15,24 +15,27 @@
 #include <cstdlib>
 
 int main (int argc, char* argv[]) {
-    if (argc < 4)
+    if (argc < 5)
         return 0;
+    // data_path scan_id output_folder render_mode
     const std::string data_path{argv[1]}; 
     const std::string scan_id{argv[2]}; 
-    const std::string output_path{argv[3]}; 
+    const std::string output_folder{argv[3]}; 
+    // 0 / default (occlusion) = all, 1 = only images, 2 = only depth
+    // 3 = images and bounding boxes, 4 = only bounding boxes
+    const int render_mode = atoi({argv[4]}); 
+    if (render_mode > 4)
+        return 0;
+
     const std::string seq_path = data_path + "/" + scan_id + "/sequence/";
+    const std::string output_path = data_path + "/" + scan_id + "/" + output_folder + "/";
 
-    bool render_only_occlusion = false;
-    float occlusion_fov_scale = 2.0f;
-    if (argc == 6){
-        render_only_occlusion = atoi(argv[4]);
-        occlusion_fov_scale = atof(argv[5]);
-
-        std::cout << "RENDER ONLY OCCLUSION: " << render_only_occlusion << std::endl;
-        std::cout << "OCCLUSION FOV SCALE: " << occlusion_fov_scale << std::endl;
-    }
-
-    RIO::Renderer renderer(seq_path, data_path, scan_id, !render_only_occlusion, true, occlusion_fov_scale);
+    const bool save_images = (render_mode != 2) && (render_mode != 4);
+    const bool save_depth = render_mode != 4;
+    const bool save_bounding_boxes = (render_mode != 1) && (render_mode != 2);
+    const bool save_occlusion = render_mode == 0;
+    const float fov_scale = (save_occlusion ? 2.0f : 1.0f);
+    RIO::Renderer renderer(seq_path, data_path, scan_id, save_images, save_depth, save_bounding_boxes, save_occlusion, fov_scale);
     renderer.Init();
     renderer.RenderAllFrames(output_path);
 }

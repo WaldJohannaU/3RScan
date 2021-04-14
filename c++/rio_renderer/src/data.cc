@@ -109,7 +109,7 @@ bool Data::LoadIntrinsics() {
         }
         file.close();
         return true;
-    }
+    } else throw std::system_error(errno, std::system_category(), "failed to open " + calib_file);
     return false;
 }
 
