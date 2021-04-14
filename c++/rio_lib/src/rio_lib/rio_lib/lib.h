@@ -43,6 +43,12 @@ class RIOLibInterface {
     virtual const Eigen::Matrix4f GetCameraPose(const std::string& scan_id, const int frame_id,
                                                 const bool normalize2reference,
                                                 const bool mm = false) const = 0;
+    // Sets the camera pose of frame_id of a given scan_id. Behaves the same as
+    // Eigen::Matrix4f GetCameraPose() but returns a false if reading the camera pose file was
+    // unsecessful.
+    virtual const bool GetCameraPose(Eigen::Matrix4f& pose, const std::string& scan_id, 
+                                     const int frame_id, const bool normalize2reference,
+                                     const bool mm = false) const = 0;
     // Backprojects the depth image of a given frame_id with the corresponding camera pose
     // Colores point cloud with the corresponding RGB image.
     virtual const bool Backproject(const std::string& scan_id, const int frame_id,

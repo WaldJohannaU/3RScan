@@ -52,6 +52,14 @@ public:
                                         const int frame_id,
                                         const bool normalize2reference,
                                         const bool mm = false) const override;
+    // Sets the camera pose of frame_id of a given scan_id. Behaves the same as
+    // Eigen::Matrix4f GetCameraPose() but returns false if reading the camera pose file was
+    // unsecessful.
+    const bool GetCameraPose(Eigen::Matrix4f& pose,
+                             const std::string& scan_id, 
+                             const int frame_id,
+                             const bool normalize2reference,
+                             const bool mm = false) const override;
     // Backprojects the depth image of a given frame_id with the corresponding camera pose
     // Colores point cloud with the corresponding RGB image.
     const bool Backproject(const std::string& scan_id, const int frame_id, 

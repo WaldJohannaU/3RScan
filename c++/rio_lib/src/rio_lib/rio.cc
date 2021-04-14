@@ -129,7 +129,18 @@ const Eigen::Matrix4f RIO::GetCameraPose(const std::string& scan_id,
                                          const int frame_id,
                                          const bool normalize2reference,
                                          const bool mm) const {
-    return sequence_.GetPose(scan_id, frame_id, normalize2reference, mm);
+    bool valid_pose = false;
+    return sequence_.GetPose(scan_id, frame_id, normalize2reference, mm, valid_pose);
+}
+
+const bool RIO::GetCameraPose(Eigen::Matrix4f& pose,
+                              const std::string& scan_id, 
+                              const int frame_id,
+                              const bool normalize2reference,
+                              const bool mm) const {
+    bool valid_pose = false;    
+    pose = sequence_.GetPose(scan_id, frame_id, normalize2reference, mm, valid_pose);
+    return valid_pose;
 }
 
 const bool RIO::Backproject(const std::string& scan_id, const int frame_id,

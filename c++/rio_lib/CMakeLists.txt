@@ -6,3 +6,4 @@ find_package(Eigen3 REQUIRED)
 
 add_subdirectory(src/rio_lib)
 add_subdirectory(src/example)
+add_subdirectory(src/align_poses)

@@ -25,7 +25,7 @@ public:
     const Eigen::Matrix4f GetPose(const std::string& scan_id,
                                   const int& frame_id,
                                   const bool normalized2reference,
-                                  const bool mm) const;
+                                  const bool mm, bool& valid_pose) const;
     const bool Backproject(const std::string& scan_id, const int frame_id, 
                            const bool normalized2reference = false) const;
 private:
@@ -34,7 +34,7 @@ private:
     Eigen::Matrix4f pose{Eigen::Matrix4f::Identity()};
     
     void SaveRIOPlyFile(const std::string file, RIO::PlyData& ply_file, bool ascii) const;
-    void LoadPose(const std::string& pose_file, Eigen::Matrix4f& pose,
+    bool LoadPose(const std::string& pose_file, Eigen::Matrix4f& pose,
                   const bool transform_mm) const;
     // Functions to load intrinsics of different types.
     // 3RScan currently only supports _info.txt

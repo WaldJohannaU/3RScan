@@ -13,9 +13,10 @@ Sequence::Sequence(const std::string& data_path, const Data& json_data): json_da
 const Eigen::Matrix4f Sequence::GetPose(const std::string& scan_id, 
                                         const int& frame_id,
                                         const bool normalized2reference,
-                                        const bool mm) const {
+                                        const bool mm,
+                                        bool& valid_pose) const {
     Eigen::Matrix4f pose{Eigen::Matrix4f::Identity()};
-    LoadPose(config_.GetPose(scan_id, frame_id), pose, mm);
+    valid_pose = LoadPose(config_.GetPose(scan_id, frame_id), pose, mm);
     if (normalized2reference) {
         Eigen::Matrix4f rescan2reference{json_data_.GetRescanTransform(scan_id)};
         if (mm)
@@ -26,8 +27,9 @@ const Eigen::Matrix4f Sequence::GetPose(const std::string& scan_id,
          return pose;
 }
 
-void Sequence::LoadPose(const std::string& pose_file, Eigen::Matrix4f& pose,
+bool Sequence::LoadPose(const std::string& pose_file, Eigen::Matrix4f& pose,
                         const bool transform_mm) const {
+    bool valid_pose = false;
     // Read camera pose (it's the transformation from the camera to the world coordiante system).
     std::ifstream file(pose_file);
     if (file.is_open()) {
@@ -37,7 +39,9 @@ void Sequence::LoadPose(const std::string& pose_file, Eigen::Matrix4f& pose,
         if (transform_mm)
             pose.block<3,1>(0,3) *= kMeterToMillimeter;
         file.close();
+        valid_pose = true;
     }
+    return valid_pose;
 }
 
 bool Sequence::LoadInfoIntrinsics(const std::string& filename,
@@ -122,7 +126,8 @@ const bool Sequence::Backproject(const std::string& scan_id, const int frame_id,
     }
     cv::Mat RGB = cv::imread(config_.GetColor(scan_id, frame_id), -1);
     cv::resize(RGB, RGB_resized, cv::Size(depth.cols, depth.rows));
-    Eigen::Matrix4f pose_camera2world = GetPose(scan_id, frame_id, normalized2reference, true);
+    bool valid_pose = false;
+    Eigen::Matrix4f pose_camera2world = GetPose(scan_id, frame_id, normalized2reference, true, valid_pose);
     // Load intrinsics
     RIO::Intrinsics intrinsics;
     if (LoadIntrinsics(RIO::CalibFormat::InfoTxt, config_.GetCameraInfo(scan_id), true, intrinsics)) {

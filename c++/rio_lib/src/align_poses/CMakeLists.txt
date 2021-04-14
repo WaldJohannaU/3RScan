@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(rio_example)
+project(align_poses)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/../../bin)
 
