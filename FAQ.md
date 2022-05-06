@@ -2,7 +2,7 @@
 Necessary dependencies as well as instructions on how to build and run our library and examples is described [here](https://github.com/WaldJohannaU/3RScan/tree/master/c++/README.md).
 
 ## References vs. Rescans: What's the difference?
-The scans in 3RScan are organized by scene (being an indoor space e.g. a kitchen or a bedroom). We provide multiple scans of each indoor scene, one scan has been selected as the reference / initial scan (usually the most complete or the first scan). Each scene is identified by the scan identifier (hash value), where **`scene["reference"]`** is the scan id of the initial scan as follows [**`3RScan.json`**](http://campar.in.tum.de/files/3RScan/3RScan.json):
+The scans in 3RScan are organized by scene (being an indoor space e.g. a kitchen or a bedroom). We provide multiple scans of each indoor scene, one scan has been selected as the reference / initial scan (usually the most complete or the first scan). Each scene is identified by the scan identifier (hash value), where **`scene["reference"]`** is the scan id of the initial scan as follows [**`3RScan.json`**](http://campar.in.tum.de/public_datasets/3RScan/3RScan.json):
 
 ```javascript
 [
@@ -28,10 +28,10 @@ All the other remaining scans are the rescans, **`scene["reference"]["scans"]`**
 ```
 
 #### How to determine if a scan belongs to the train, val or test split?
-Each scene with the reference and all corresponding rescans in [**`3RScan.json`**](http://campar.in.tum.de/files/3RScan/3RScan.json) are assigned a split, see **`type`** field in json file. We also provide a list of ids here: [**`splits`**](https://github.com/WaldJohannaU/3RScan/tree/master/splits). Please note that these files only include references. A full list of scan ids including rescans can be found here: [**`train`**](http://campar.in.tum.de/files/3RScan/train_scans.txt), [**`val`**](http://campar.in.tum.de/files/3RScan/val_scans.txt), [**`test`**](http://campar.in.tum.de/files/3RScan/test_scans.txt).
+Each scene with the reference and all corresponding rescans in [**`3RScan.json`**](http://campar.in.tum.de/public_datasets/3RScan/3RScan.json) are assigned a split, see **`type`** field in json file. We also provide a list of ids here: [**`splits`**](https://github.com/WaldJohannaU/3RScan/tree/master/splits). Please note that these files only include references. A full list of scan ids including rescans can be found here: [**`train`**](http://campar.in.tum.de/public_datasets/3RScan/train_scans.txt), [**`val`**](http://campar.in.tum.de/public_datasets/3RScan/val_scans.txt), [**`test`**](http://campar.in.tum.de/public_datasets/3RScan/test_scans.txt).
 
 #### How to align the rescan 3D models and camera poses with the reference scan?
-Scene-to-scene transformations to align the 3D maps are available in the json-metafile [**`3RScan.json`**](http://campar.in.tum.de/files/3RScan/3RScan.json). Please note that the transformation of the translation in the json file is in millimeter while the 3D models are stored in meters. We provide the function **`Transform2Reference()`** as an example on how to use those in our **`rio_example`** project. The same procedure applies when aligning the ground truth trajectories, see function **`GetCameraPose()`** and [**`align_poses`**](https://github.com/WaldJohannaU/3RScan/tree/master/c%2B%2B/rio_lib/src/align_poses).
+Scene-to-scene transformations to align the 3D maps are available in the json-metafile [**`3RScan.json`**](http://campar.in.tum.de/public_datasets/3RScan/3RScan.json). Please note that the transformation of the translation in the json file is in millimeter while the 3D models are stored in meters. We provide the function **`Transform2Reference()`** as an example on how to use those in our **`rio_example`** project. The same procedure applies when aligning the ground truth trajectories, see function **`GetCameraPose()`** and [**`align_poses`**](https://github.com/WaldJohannaU/3RScan/tree/master/c%2B%2B/rio_lib/src/align_poses).
 
 ## Dataformat: How is the data stored?
 The [README](https://github.com/WaldJohannaU/3RScan/tree/master/README.md) gives a rough overview about the available files in 3RScan. Please note, our download script allows to download a subset of the dataset (by filtering either by file name or scan id).
@@ -54,7 +54,7 @@ There are quite some files to possibly parse to get the semantic labels, you hav
 The ply files of the first version of our dataset are indeed stored as binary. Our code provides a function **`ReSavePLYASCII()`** that uses **`tinyply`** to load the binary ply and to save it in ASCII format. The files in v2 the data is stored as ascii.
 
 ### How do I get the semantic labels?
-There are two ways to extract the semantic class of each 3D point: either via the **`semseg.v2.json`** or via [**`objects.json`**](http://campar.in.tum.de/files/3DSSG/3DSSG/objects.json). The function **`PrintSemanticLabels()`** shows simple code to print these labels for a specific scene. A **`semseg.v2.json`** is provided per scan as follows:
+There are two ways to extract the semantic class of each 3D point: either via the **`semseg.v2.json`** or via [**`objects.json`**](http://campar.in.tum.de/public_datasets/3DSSG/3DSSG/objects.json). The function **`PrintSemanticLabels()`** shows simple code to print these labels for a specific scene. A **`semseg.v2.json`** is provided per scan as follows:
 
 ```javascript
 {
@@ -221,7 +221,7 @@ where the render mode 0 saves images, bounding box and occlusion / truncation, 1
 The reason for this is the annotation interface / segmentation code that we used to get the labels. However, the number of faces is the same, see **`TransformInstance`** on how to extract the 3D model of a specific instance from the 3D mesh. In v2 of the dataset **`mesh_refined.v2.obj`** and **`labels.instances.annotated.v2.ply`** have the same number of vertices.
 
 ### Some scenes in 3RScan seem to be quite small / partial, why's that?
-Some scans (mostly rescans) are indeed quite small due to issues when processing the data on the phone or our servers. While this only affects a small number of scans, we still decided to provide the scans scince it might be useful for some tasks. Feel free to skip them if it’s not useful for you, a list of rather small scans are available [here](http://campar.in.tum.de/files/3RScan/partial.txt).
+Some scans (mostly rescans) are indeed quite small due to issues when processing the data on the phone or our servers. While this only affects a small number of scans, we still decided to provide the scans scince it might be useful for some tasks. Feel free to skip them if it’s not useful for you, a list of rather small scans are available [here](http://campar.in.tum.de/public_datasets/3RScan/partial.txt).
 
 ### What is the difference between v1 and v2 of the dataset?
 In v2 the labels and annotations are cleaned, we removed typos in the semantic labels and minimal changes in the 3D annotation. We additionally adjusted the 3D models by excluding vertices, faces or segments that were annotated with the class _remove_ from the mesh, the semantic segmentation, the corresponding over-segmentation and the labelled 3D model. The **`labels.instances.annotated.v2.ply`** files are saved as ASCII and the number of vertices is now the same as in the **`*.obj`** file. Please also note the [mapping](https://docs.google.com/spreadsheets/d/1eRTJ2M9OHz7ypXfYD-KTR1AIT-CrVLmhJf8mxgVZWnI/edit?usp=sharing) and the vertex properties of the **`*.ply`** file: objectId (instance ID), globalId (global 3RScan mapping) and its semantic mappings to NYU40, Eigen13 and RIO27.
