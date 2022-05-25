@@ -34,7 +34,7 @@ target_include_directories(${PROJECT_NAME}_render_all PRIVATE include
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${OPENGL_LIBRARIES}
-									${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${assimp_LIBRARIES})
+				${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${assimp_LIBRARIES} ${CMAKE_DL_LIBS} pthread)
 
 target_link_libraries(${PROJECT_NAME}_render_all ${OpenCV_LIBS} ${OPENGL_LIBRARIES}
-									${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${assimp_LIBRARIES})
+				${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${assimp_LIBRARIES} ${CMAKE_DL_LIBS} pthread)
