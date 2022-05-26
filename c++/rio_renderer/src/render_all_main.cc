@@ -27,8 +27,8 @@ int main (int argc, char* argv[]) {
     if (render_mode > 4)
         return 0;
 
-    const std::string seq_path = data_path + "/" + scan_id + "/sequence/";
-    const std::string output_path = data_path + "/" + scan_id + "/" + output_folder + "/";
+    const std::string seq_path = data_path + "/" + scan_id + "/sequence";
+    const std::string output_path = data_path + "/" + scan_id + "/" + output_folder;
 
     const bool save_images = (render_mode != 2) && (render_mode != 4);
     const bool save_depth = render_mode != 4;

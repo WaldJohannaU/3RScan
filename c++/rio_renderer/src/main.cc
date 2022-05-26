@@ -18,8 +18,8 @@ int main (int argc, char* argv[]) {
     const std::string data_path{argv[1]}; 
     const std::string scan_id{argv[2]}; 
     const std::string output_folder{argv[3]}; 
-    const std::string seq_path = data_path + "/" + scan_id + "/sequence/";
-    const std::string output_path = data_path + "/" + scan_id + "/" + output_folder + "/";
+    const std::string seq_path = data_path + "/" + scan_id + "/sequence";
+    const std::string output_path = data_path + "/" + scan_id + "/" + output_folder;
     RIO::Renderer renderer(seq_path, data_path, scan_id);
     renderer.Init();
     renderer.Render(28, output_path);
@@ -38,6 +38,7 @@ int main (int argc, char* argv[]) {
                 cv::rectangle(bb_image, cv::Point(box(0), box(1)), cv::Point(box(2), box(3)), cv::Scalar(rgb(2),rgb(1),rgb(0)), 3);
             }
         }
+        return 0;
         cv::resize(bb_image, bb_image, cv::Size(bb_image.cols/4, bb_image.rows/4));
         cv::rotate(bb_image, bb_image, cv::ROTATE_90_CLOCKWISE);
         cv::imshow("Bounding Boxes", bb_image);
