@@ -113,9 +113,10 @@ bool Sequence::LoadIntrinsics(const RIO::CalibFormat& format,
         return LoadYamlIntrinsics(filename, intrinsics);
     return false;
 }
-
-const bool Sequence::Backproject(const std::string& scan_id, const int frame_id,
+/*
+const bool Sequence::BackprojectBackup(const std::string& scan_id, const int frame_id,
                                  const bool normalized2reference) const {
+    // original func. for backup
     std::cout << normalized2reference << std::endl;
     // The depth stores the distance in mm as a 16bit.
     cv::Mat RGB_resized;
@@ -156,6 +157,58 @@ const bool Sequence::Backproject(const std::string& scan_id, const int frame_id,
         }
         ply_data.save(config_.GetPly(scan_id, frame_id), true);
         return !ply_data.vertices.empty();
+    }
+    return false;
+}
+*/
+
+const bool Sequence::Backproject(const std::string& scan_id, const int frame_id,
+                                 const bool normalized2reference) const {
+    std::cout << normalized2reference << std::endl;
+    // make frame_id unfunctional and use new_frame_id to iterative all frames
+    int new_frame_id = 0;
+    while (true){
+        // The depth stores the distance in mm as a 16bit.
+        cv::Mat RGB_resized;
+        cv::Mat depth = cv::imread(config_.GetDepth(scan_id, new_frame_id), -1);
+        if (depth.empty()) {
+            std::cout << "file not found." << config_.GetDepth(scan_id, new_frame_id) << std::endl;
+            break;
+        }
+        cv::Mat RGB = cv::imread(config_.GetColor(scan_id, new_frame_id), -1);
+        cv::resize(RGB, RGB_resized, cv::Size(depth.cols, depth.rows));
+        bool valid_pose = false;
+        Eigen::Matrix4f pose_camera2world = GetPose(scan_id, new_frame_id, normalized2reference, true, valid_pose);
+        // Load intrinsics
+        RIO::Intrinsics intrinsics;
+        if (LoadIntrinsics(RIO::CalibFormat::InfoTxt, config_.GetCameraInfo(scan_id), true, intrinsics)) {
+            RIO::PlyData ply_data;
+            for (int row = 0; row < depth.rows; row++) {
+                for (int col = 0; col < depth.cols; col++) {
+                    // the depth
+                    const unsigned short depth_value = depth.at<unsigned short>(row, col);
+                    if (depth_value != 0) {
+                        // the color pixel at (row, col) corresponds to the depth pixel (row, col).
+                        const cv::Vec3b color = RGB_resized.at<cv::Vec3b>(row, col);
+                        // backproject 2D depth
+                        const Eigen::Vector2f xy((col - intrinsics.cx) / intrinsics.fx, (row - intrinsics.cy) / intrinsics.fy);
+                        const Eigen::Vector4f point(xy.x() * depth_value, xy.y() * depth_value, depth_value, 1.0f);
+                        // apply pose transformation
+                        const Eigen::Vector4f point_transformed = pose_camera2world * point;
+                        ply_data.vertices.push_back(point_transformed(0) * kMillimeterToMeter);
+                        ply_data.vertices.push_back(point_transformed(1) * kMillimeterToMeter);
+                        ply_data.vertices.push_back(point_transformed(2) * kMillimeterToMeter);
+
+                        ply_data.colors.push_back(color(2));
+                        ply_data.colors.push_back(color(1));
+                        ply_data.colors.push_back(color(0));
+                    }
+                }
+            }
+            ply_data.save(config_.GetPly(scan_id, new_frame_id), true);
+            //return !ply_data.vertices.empty();
+        }
+        new_frame_id+=1;
     }
     return false;
 }

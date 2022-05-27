@@ -25,9 +25,11 @@ FIND_PATH(GLFW_INCLUDE_DIRS GLFW/glfw3.h DOC "Path to GLFW include directory."
   $ENV{GLFW_ROOT}
   PATH_SUFFIX include #For finding the include file under the root of the glfw expanded archive, typically on Windows.
   PATHS
+  /private/home/chaoyizhang/.local/include/
   /usr/include/
   /usr/local/include/
-  # By default headers are under GLFW subfolder
+  # By default headers are under GLFW subfoldeir
+  /private/home/chaoyizhang/.local/include/GLFW
   /usr/include/GLFW
   /usr/local/include/GLFW
   ${PROJECT_SOURCE_DIR}/ThirdParty/include/
@@ -42,6 +44,7 @@ FIND_LIBRARY(GLFW_LIBRARIES DOC "Absolute path to GLFW library."
   $ENV{GLFW_ROOT}
   PATH_SUFFIXES lib/win32 #For finding the library file under the root of the glfw expanded archive, typically on Windows.
   PATHS
+  /private/home/chaoyizhang/.local/lib
   /usr/local/lib
   /usr/lib
   ${PROJECT_SOURCE_DIR}/ThirdParty/lib64

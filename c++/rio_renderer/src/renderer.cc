@@ -55,20 +55,25 @@ const cv::Mat& Renderer::GetDepth() const {
 }
 
 int Renderer::Init() {
-    if (!(glfwInit() && data_.LoadIntrinsics() && data_fov_scale_.LoadIntrinsics()))
+    if (!(glfwInit() && data_.LoadIntrinsics() && data_fov_scale_.LoadIntrinsics())){
+        std::cout << "something wrong 1"  << std::endl;
         return -1; 
+    } 
 
     InitGLFW();
     // Create a GLFWwindow object that we can use for GLFW's functions
     window = glfwCreateWindow(data_.intrinsics.width, data_.intrinsics.height, "Evaluation", nullptr, nullptr);
     if (nullptr == window) {
+        std::cout << "something wrong 2"  << std::endl;
         glfwTerminate();
         return EXIT_FAILURE;
     }
     glfwMakeContextCurrent(window);
     glewExperimental = GL_TRUE;
-    if (GLEW_OK != glewInit())
+    if (GLEW_OK != glewInit()){
+        std::cout << "something wrong 3"  << std::endl;
         return EXIT_FAILURE;
+    }
     glEnable(GL_DEPTH_TEST);
     
     // Setup and compile our shaders
@@ -105,6 +110,7 @@ int Renderer::Init() {
     initalized_ = true;
     // We have to read the buffer size because of retrina displays. 
     glfwGetFramebufferSize(window, &buffer_width, &buffer_height);
+    //std::cout << "Renderer::Init(): done"  << std::endl;
     return 0;
 }
 
@@ -203,11 +209,13 @@ void Renderer::Render(Model& model, Shader& shader) {
 }
 
 void Renderer::InitGLFW() {
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    //std::cout << "InitGLFW(): done"  << std::endl;
 }
 
 bool Renderer::LoadObjects(const std::string& obj_file) {

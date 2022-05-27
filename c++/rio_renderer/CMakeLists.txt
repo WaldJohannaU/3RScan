@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
+cmake_policy(SET CMP0072 NEW)
+
 project(rio_renderer)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
@@ -6,7 +8,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 find_package(Eigen3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(GLFW3 REQUIRED)
+find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(assimp REQUIRED)
 
@@ -34,7 +36,7 @@ target_include_directories(${PROJECT_NAME}_render_all PRIVATE include
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 11 CXX_STANDARD_REQUIRED YES)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS} ${OPENGL_LIBRARIES}
-									${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${assimp_LIBRARIES})
+				${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${assimp_LIBRARIES} ${CMAKE_DL_LIBS} pthread)
 
 target_link_libraries(${PROJECT_NAME}_render_all ${OpenCV_LIBS} ${OPENGL_LIBRARIES}
-									${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${assimp_LIBRARIES})
+				${GLFW_LIBRARIES} ${GLEW_LIBRARIES} ${assimp_LIBRARIES} ${CMAKE_DL_LIBS} pthread)
